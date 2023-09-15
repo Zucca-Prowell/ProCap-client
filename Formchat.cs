@@ -54,5 +54,13 @@ namespace PROCAP_CLIENT
             if (e.KeyChar == (char)Keys.Enter)
                 buttonsubmit_Click(sender, e);
         }
+
+        private void Formchat_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                Close();
+            }
+        }
     }
 }

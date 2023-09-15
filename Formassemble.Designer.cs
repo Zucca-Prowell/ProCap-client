@@ -74,6 +74,7 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(121, 23);
             textBox1.TabIndex = 3;
+            textBox1.KeyDown += textBox1_KeyDown;
             // 
             // label1
             // 
@@ -98,9 +99,11 @@
             Controls.Add(comboBox1);
             Controls.Add(buttonsubmit);
             Controls.Add(dataGridView1);
+            KeyPreview = true;
             Name = "Formassemble";
             Text = "成型產量";
             Load += Formassemble_Load;
+            KeyDown += Formassemble_KeyDown;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

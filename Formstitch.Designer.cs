@@ -63,6 +63,7 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 2;
+            textBox1.KeyDown += textBox1_KeyDown;
             // 
             // dataGridView1
             // 
@@ -98,9 +99,11 @@
             Controls.Add(textBox1);
             Controls.Add(label1);
             Controls.Add(buttonsubmit);
+            KeyPreview = true;
             Name = "Formstitch";
             Text = "針車產量";
             Load += Formstitch_Load;
+            KeyDown += Formstitch_KeyDown;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

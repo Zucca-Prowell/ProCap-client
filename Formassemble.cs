@@ -123,5 +123,17 @@ namespace PROCAP_CLIENT
         {
             textBox1.Focus();
         }
+
+        private void Formassemble_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode==Keys.Enter)
+                buttonsubmit_Click(sender, e);
+        }
     }
 }

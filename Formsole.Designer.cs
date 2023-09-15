@@ -54,6 +54,7 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(121, 23);
             textBox1.TabIndex = 1;
+            textBox1.KeyDown += textBox1_KeyDown;
             // 
             // comboBox1
             // 
@@ -98,9 +99,11 @@
             Controls.Add(comboBox1);
             Controls.Add(textBox1);
             Controls.Add(buttonsubmit);
+            KeyPreview = true;
             Name = "Formsole";
             Text = "組底產量";
             Load += Formsole_Load;
+            KeyDown += Formsole_KeyDown;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

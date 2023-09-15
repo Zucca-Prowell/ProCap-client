@@ -1,10 +1,10 @@
-using static System.Windows.Forms.DataFormats;
+﻿using static System.Windows.Forms.DataFormats;
 
 namespace PROCAP_CLIENT
 {
     public partial class Formmain : Form
     {
-        private bool isFormOpen=false;
+        private bool isFormOpen = false;
         public Formmain()
         {
             InitializeComponent();
@@ -14,13 +14,14 @@ namespace PROCAP_CLIENT
         {
 
         }
-        
+
         private void buttonadd_Click(object sender, EventArgs e)
-        {   
+        {
             //if()
             switch (comboBoxdp.SelectedIndex)
             {
-                case 0: {
+                case 0:
+                    {
                         if (!isFormOpen)
                         {
                             isFormOpen = true;
@@ -29,7 +30,8 @@ namespace PROCAP_CLIENT
                             formchat.Show();
                             formchat.textBox1.Focus();
                         }
-                      } break;
+                    }
+                    break;
                 case 1:
                     {
                         if (!isFormOpen)
@@ -38,9 +40,10 @@ namespace PROCAP_CLIENT
                             var formstitch = new Formstitch();
                             formstitch.FormClosed += (s, args) => isFormOpen = false;
                             formstitch.Show();
-                            formstitch.textBox1.Focus();    
+                            formstitch.textBox1.Focus();
                         }
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         if (!isFormOpen)
@@ -51,7 +54,8 @@ namespace PROCAP_CLIENT
                             formsole.Show();
                             formsole.textBox1.Focus();
                         }
-                    } break;
+                    }
+                    break;
                 case 3:
                     {
                         if (!isFormOpen)
@@ -62,8 +66,9 @@ namespace PROCAP_CLIENT
                             formassemble.Show();
                             formassemble.textBox1.Focus();
                         }
-                    } break;
-                    //case 4�ݲK�[
+                    }
+                    break;
+                //case 4待添加
                 case 4:
                     {
                         if (!isFormOpen)
@@ -74,13 +79,26 @@ namespace PROCAP_CLIENT
                             formlean.Show();
                             formlean.textBoxchat.Focus();
                         }
-                    } break;
+                    }
+                    break;
             }
         }
 
         private void Formmain_Load(object sender, EventArgs e)
         {
             comboBoxdp.SelectedIndex = 0;
+        }
+
+        private void buttonsearch_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(textBoxsearch.Text.Trim()))
+            {
+                MessageBox.Show("搜索不能为空");
+            }
+            else
+            {
+                //正则表达式+显示DB相应数据
+            }
         }
     }
 }

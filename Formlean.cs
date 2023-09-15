@@ -1,67 +1,36 @@
 ﻿using System.Drawing.Text;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Reflection.Metadata;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace PROCAP_CLIENT
 {
     public partial class Formlean : Form
     {
-        
-        private bool hasfocus = false;
+        TextBox[] textcheck = new TextBox[6];
+        bool[] boolarray = new bool[9];
+        bool judgement = false;
+        int k = 0;
+        bool flag = false; 
+        bool result = false;
+        int counted;
         public Formlean()
         {
             InitializeComponent();
-            
-            this.KeyDown += Formlean_KeyDown;
-            this.Paint += Formlean_Paint;
-            this.LostFocus += Formlean_LostFocus;
-            this.GotFocus += Formlean_GotFocus;
-            this.MouseDown += Formlean_MouseDown;
         }
-        private void Formlean_Paint(object sender, PaintEventArgs e)
-        {
-            if (hasfocus)
-            {
-                ControlPaint.DrawFocusRectangle(e.Graphics, this.ClientRectangle);
-            }
-        }
-
-        private void Formlean_GotFocus(object sender, EventArgs e)
-        {
-            hasfocus = true;
-            this.Invalidate(); // 重新绘制窗体以显示焦点框
-        }
-
-        private void Formlean_LostFocus(object sender, EventArgs e)
-        {
-            hasfocus = false;
-            this.Invalidate(); // 重新绘制窗体以隐藏焦点框
-        }
-
         private void Formlean_Load(object sender, EventArgs e)
         {
             timer1.Start();
-           
         }
-
-        private void radioButtonlean1_CheckedChanged(object sender, EventArgs e)
+        private void initializedata()
         {
-
-        }
-       
-        private void buttonsubmit_Click(object sender, EventArgs e)
-        {
-            
-            int k = 0;
-            TextBox[] textcheck = new TextBox[6];
             textcheck[0] = textBoxchat;
             textcheck[1] = textBoxstitch1;
             textcheck[2] = textBoxstitch2;
             textcheck[3] = textBoxstitch3;
             textcheck[4] = textBoxstitch4;
             textcheck[5] = textBoxassemble;
-            bool[] boolarray = new bool[9];
             boolarray[0] = radioButtonlean1.Checked;
             boolarray[1] = radioButtonlean2.Checked;
             boolarray[2] = radioButtonlean3.Checked;
@@ -71,32 +40,52 @@ namespace PROCAP_CLIENT
             boolarray[6] = string.IsNullOrEmpty(textcheck[3].Text.Trim());
             boolarray[7] = string.IsNullOrEmpty(textcheck[4].Text.Trim());
             boolarray[8] = string.IsNullOrEmpty(textcheck[5].Text.Trim());
-            bool result = false;
+        }
+        private bool judgenull()
+        {
+           
             for (int i = 0; i < 3; i++)
             {
                 result = (result || boolarray[i]);
             }
             if (!result)
-            { MessageBox.Show("請選擇lean線線別"); }
+            { 
+                MessageBox.Show("請選擇lean線線別");
+            }
             else
             {
                 for (int j = 3; j < boolarray.Length; j++)
                 {
-
                     if (boolarray[j])
                     {
                         MessageBox.Show("有欄為空");
                         textcheck[j - 3].Focus();
+                        flag = true;
+                        k = 0;
                         break;
                     }
                     else
                         k++;
                 }
+                if (result && (k == textcheck.Length))
+                {
+                    judgement = true;
+                    result = false;
+                    k = 0;
+                }
             }
-            if (result == true && k == textcheck.Length)
+            return judgement;
+        }
+        private void buttonsubmit_Click(object sender, EventArgs e)
+        {
+            initializedata();
+            judgenull();
+            if (judgement)
             {
                 //上傳數據到DATABASE
                 MessageBox.Show("提交成功");
+                judgement = false;
+                flag = false;
                 foreach (TextBox a in textcheck)
                 {
                     a.Text = "";
@@ -111,58 +100,234 @@ namespace PROCAP_CLIENT
             label1.Text = DateTime.Now.ToString("yyyy-MM-dd" + "產量");
         }
 
-        private void textBoxchat_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxchat_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                SendKeys.Send("{tab}");
+            initializedata();
+            switch (e.KeyCode)
+            { 
+                case Keys.Enter:
+                    { 
+                        if (!flag)
+                        { 
+                            SendKeys.Send("{tab}"); 
+                        }
+                        else
+                        {
+                            if((string.IsNullOrEmpty(textBoxchat.Text)))
+                                SendKeys.Send("{tab}");
+                            else
+                                {
+                                for (int i = 3; i < boolarray.Length; i++)
+                                {
+                                    if (boolarray[i])
+                                    {
+                                        textcheck[i - 3].Focus();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } break;
+                case Keys.Up:radioButtonlean3.Focus();break;
+                case Keys.Down:textBoxstitch1.Focus();break;               
+            }
         }
 
-        private void textBoxstitch1_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxstitch1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                SendKeys.Send("{tab}");
+            initializedata();
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    {
+                        if (!flag)
+                        {
+                            SendKeys.Send("{tab}");
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(textBoxstitch1.Text))
+                                SendKeys.Send("{tab}");
+                            else
+                            {
+                                for (int i = 3; i < boolarray.Length; i++)
+                                {
+                                    if (boolarray[i])
+                                    {
+                                        textcheck[i - 3].Focus();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Keys.Up: textBoxchat.Focus(); break;
+                case Keys.Down: textBoxstitch2.Focus(); break;
+                case Keys.Back: { if (string.IsNullOrEmpty(textBoxstitch1.Text)) { textBoxchat.Focus(); } } break;
+            }
         }
 
-        private void textBoxstitch2_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxstitch2_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                SendKeys.Send("{tab}");
+            initializedata();
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    {
+                        if (!flag)
+                        {
+                            SendKeys.Send("{tab}");
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(textBoxstitch2.Text))
+                                SendKeys.Send("{tab}");
+                            else
+                            {
+                                for (int i = 3; i < boolarray.Length; i++)
+                                {
+                                    if (boolarray[i])
+                                    {
+                                        textcheck[i - 3].Focus();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Keys.Up: textBoxstitch1.Focus(); break;
+                case Keys.Down: textBoxstitch3.Focus(); break;
+                case Keys.Back: { if (string.IsNullOrEmpty(textBoxstitch2.Text)) { textBoxstitch1.Focus(); } } break;
+            }
         }
-
-        private void textBoxstitch3_KeyPress(object sender, KeyPressEventArgs e)
+            private void textBoxstitch3_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                SendKeys.Send("{tab}");
-        }
+            initializedata();
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    {
+                        if (!flag)
+                        {
+                            SendKeys.Send("{tab}");
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(textBoxstitch3.Text))
+                                SendKeys.Send("{tab}");
+                            else
+                            {
+                                for (int i = 3; i < boolarray.Length; i++)
+                                {
+                                    if (boolarray[i])
+                                    {
+                                        textcheck[i - 3].Focus();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Keys.Up: textBoxstitch2.Focus(); break;
+                    case Keys.Down: textBoxstitch4.Focus(); break;
+                    case Keys.Back: { if (string.IsNullOrEmpty(textBoxstitch3.Text)) { textBoxstitch2.Focus(); } } break;
+                }
+            }
 
-        private void textBoxstitch4_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxstitch4_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                SendKeys.Send("{tab}");
-        }
+            initializedata();
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    {
+                        if (!flag)
+                        {
+                            SendKeys.Send("{tab}");
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(textBoxstitch4.Text))
+                                SendKeys.Send("{tab}");
+                            else
+                            {
+                                for (int i = 3; i < boolarray.Length; i++)
+                                {
+                                    if (boolarray[i])
+                                    {
+                                        textcheck[i - 3].Focus();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Keys.Up: textBoxstitch3.Focus(); break;
+                    case Keys.Down: textBoxassemble.Focus(); break;
+                    case Keys.Back: { if (string.IsNullOrEmpty(textBoxstitch4.Text)) { textBoxstitch3.Focus(); } } break;
+                }
+            }
 
-        private void textBoxassemble_KeyPress(object sender, KeyPressEventArgs e)
+        private void textBoxassemble_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Enter)
-                buttonsubmit_Click(sender, e);
-        }
+            initializedata();
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    {
+                        if (!flag)
+                        {
+                            SendKeys.Send("{tab}");
+                        }
+                        else
+                        {
+                            for (int i = 3; i < boolarray.Length; i++)
+                            {
+                                if (boolarray[i])
+                                {
+                                    textcheck[i - 3].Focus();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Keys.Up: textBoxstitch4.Focus(); break;
+                    case Keys.Down: buttonsubmit.Focus(); break;
+                    case Keys.Back: { if (string.IsNullOrEmpty(textBoxassemble.Text)) { textBoxstitch4.Focus(); } } break;
+                }
+            }
 
-        private void radioButtonlean1_KeyPress(object sender, KeyPressEventArgs e)
-        {
 
-        }
-
-        private void Formlean_MouseDown(object sender, MouseEventArgs e)
-        {
-            Focus();
-        }
 
         private void Formlean_KeyDown(object sender, KeyEventArgs e)
         {
-          
-            if (e.KeyCode== Keys.Escape)
+            initializedata();
+            counted = 3;
+            for (int count = 3; count < boolarray.Length; count++)
             {
-                Close();
+                if (boolarray[count])
+                    break;
+                else
+                    counted++;
+            }
+            switch (e.KeyCode)
+            {
+                case Keys.Escape:Close(); break;
+                case Keys.Enter: { if (counted == boolarray.Length) { buttonsubmit_Click(sender, e);counted = 3; } } break;
+            }
+        }
+
+        private void buttonclear_Click(object sender, EventArgs e)
+        {
+            initializedata();
+            foreach (TextBox a in textcheck)
+            {
+                a.Text = "";
             }
         }
     }

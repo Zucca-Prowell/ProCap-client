@@ -55,6 +55,7 @@
             buttonsearch.TabIndex = 1;
             buttonsearch.Text = "搜索";
             buttonsearch.UseVisualStyleBackColor = true;
+            buttonsearch.Click += buttonsearch_Click;
             // 
             // buttonmodify
             // 

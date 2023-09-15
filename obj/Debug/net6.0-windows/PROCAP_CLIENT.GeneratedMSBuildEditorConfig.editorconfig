@@ -14,4 +14,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = PROCAP_CLIENT
-build_property.ProjectDir = D:\ie10\Downloads\ProCap-client-cutting-master\
+build_property.ProjectDir = D:\ie10\Desktop\code\ProCap-client\

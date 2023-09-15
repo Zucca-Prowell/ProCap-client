@@ -88,9 +88,11 @@
             Controls.Add(label1);
             Controls.Add(buttonsubmit);
             Controls.Add(dataGridView1);
+            KeyPreview = true;
             Name = "Formchat";
-            Text = "裁加產量登記";
+            Text = "裁加產量";
             Load += Formchat_Load;
+            KeyDown += Formchat_KeyDown;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

@@ -124,5 +124,17 @@ namespace PROCAP_CLIENT
                     break;
             }
         }
+
+        private void Formstitch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode==Keys.Enter)
+                buttonsubmit_Click(sender, e);  
+        }
     }
 }

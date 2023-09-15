@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "I80K7BKgThmws/Gqv6+dl6A7mbJazAaBvLW616oPN1kg/yoKVG8bsRcVcvTakLZumznHSVpIy6KV4FcwJa+Mlg==",
+  "dgSpecHash": "dVqKI1UPUIZiYBeWyQL84u15XCi3MWi//oMbsqpssIPrNCgoUj88mhxGhujnT/8RZnd7LcPUAnViR3aKnT7d3w==",
   "success": true,
-  "projectFilePath": "D:\\ie10\\Downloads\\ProCap-client-cutting-master\\PROCAP_CLIENT.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "D:\\ie10\\Desktop\\code\\ProCap-client\\PROCAP_CLIENT.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ie10\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\6.0.0\\microsoft.extensions.logging.abstractions.6.0.0.nupkg.sha512",
+    "C:\\Users\\ie10\\.nuget\\packages\\npgsql\\7.0.6\\npgsql.7.0.6.nupkg.sha512",
+    "C:\\Users\\ie10\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
