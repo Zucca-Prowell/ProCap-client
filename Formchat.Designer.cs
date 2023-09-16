@@ -103,7 +103,7 @@
         private DataGridView dataGridView1;
         private Button buttonsubmit;
         private Label label1;
-        private System.Windows.Forms.Timer timer1;
         protected internal TextBox textBox1;
+         protected internal System.Windows.Forms.Timer timer1;
     }
 }

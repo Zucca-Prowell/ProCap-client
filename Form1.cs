@@ -1,4 +1,6 @@
-﻿using static System.Windows.Forms.DataFormats;
+﻿using Npgsql;
+using System.Drawing;
+using static System.Windows.Forms.DataFormats;
 
 namespace PROCAP_CLIENT
 {
@@ -87,6 +89,36 @@ namespace PROCAP_CLIENT
         private void Formmain_Load(object sender, EventArgs e)
         {
             comboBoxdp.SelectedIndex = 0;
+            //string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            //try
+            //{
+            //    using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            //    {
+            //        conn.Open();
+            //        //System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+            //        //DateTime currentTime = DateTime.Now;     
+            //        //string insertSql = "INSERT INTO cut(capacity) VALUES (1980)";
+            //        //using (NpgsqlCommand cmd = new NpgsqlCommand(insertSql, conn))
+            //        //{
+            //        //    cmd.Parameters.AddWithValue("capacity", "1980");
+            //        //    int rowsAffected = cmd.ExecuteNonQuery();
+            //        //    MessageBox.Show($"插入了 {rowsAffected} 行数据.");
+            //        //    if (rowsAffected > 0)
+            //        //    {
+            //        //        MessageBox.Show($"成功插入 {rowsAffected} 行数据。");
+            //        //    }
+            //        //    else
+            //        //    {
+            //        //        MessageBox.Show("未插入任何数据。");
+            //        //    }
+            //        //}
+
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            //}
         }
 
         private void buttonsearch_Click(object sender, EventArgs e)

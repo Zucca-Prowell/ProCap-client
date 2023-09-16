@@ -4,9 +4,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Npgsql;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PROCAP_CLIENT
 {
@@ -31,8 +34,8 @@ namespace PROCAP_CLIENT
 
         private void Formchat_Load(object sender, EventArgs e)
         {
-
             timer1.Start();
+           
         }
 
         private void buttonsubmit_Click(object sender, EventArgs e)
@@ -43,9 +46,63 @@ namespace PROCAP_CLIENT
             }
             else
             {
-                MessageBox.Show("提交成功");
-                textBox1.Text = "";
-                //將當天的產量錄入Database
+                string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+                try
+                {
+                    using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                    {
+
+                        conn.Open();
+                        DateTime currentTime = DateTime.Now.Date;
+                        // 检查数据库中是否已存在相同时间戳的记录
+                        string checkExistingSql = "SELECT COUNT(*) FROM cut WHERE c_date = @c_date";
+                        using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql, conn))
+                        {
+                            checkCommand.Parameters.AddWithValue("c_date", currentTime);
+
+                            // 检查是否存在相同时间戳的记录
+                            int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+
+                            if (count > 0)
+                            {
+                                // 如果存在相同时间戳的记录，执行更新操作
+                                string updateSql = "UPDATE cut SET capacity = @capacity WHERE c_date = @c_date";
+
+                                using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                {
+                                    updateCommand.Parameters.AddWithValue("capacity", int.Parse(textBox1.Text.Trim()));
+                                    updateCommand.Parameters.AddWithValue("c_date", currentTime);
+                                    updateCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("今日数据已更新");
+                                conn.Close();
+                                textBox1.Text = "";
+                            }
+                            else
+                            {
+                                // 如果不存在相同时间戳的记录，执行插入操作
+                                string insertSql = "INSERT INTO cut (c_date, capacity) VALUES (@c_date, @capacity)";
+
+                                using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("c_date", currentTime);
+                                    insertCommand.Parameters.AddWithValue("capacity", int.Parse(textBox1.Text.Trim()));
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("數據提交成功");
+                                conn.Close ();
+                                textBox1.Text = "";
+                            }
+                        }
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("數據庫連接失敗: " + ex.Message);
+                    textBox1.Text = "";
+                }
             }
         }
 

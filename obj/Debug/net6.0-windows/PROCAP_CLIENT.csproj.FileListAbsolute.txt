@@ -23,3 +23,17 @@ D:\ie10\Desktop\code\ProCap-client\obj\Debug\net6.0-windows\PROCAP_CLIENT.csproj
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.dll
 D:\ie10\Desktop\code\ProCap-client\obj\Debug\net6.0-windows\PROCAP_CLIENT.csproj.CopyComplete
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.EntityFrameworkCore.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.EntityFrameworkCore.Relational.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Caching.Abstractions.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Caching.Memory.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Configuration.Abstractions.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.DependencyInjection.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Logging.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Options.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions.Primitives.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.Json.NET.dll
