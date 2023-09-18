@@ -57,37 +57,40 @@ namespace PROCAP_CLIENT
                                 else
                                 {   
                                     // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingSql1 = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql1, conn))
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
+                                    string checkExistingdata = "SELECT stitch1 FROM stitch ";
+                                    using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommand.Parameters.AddWithValue("c_date", currentTime);
-
+                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
-                                        int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-
+                                        int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                        object result=checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
-                                            string updateSql1 = "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @c_date";
-
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql1, conn))
+                                            if (result != null && result != DBNull.Value)
+                                                MessageBox.Show("今日數據已更新");
+                                            else
+                                                MessageBox.Show("數據提交成功");
+                                            string updateSql= "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @c_date";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch1", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            MessageBox.Show("今日数据已更新");
+                                            
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
                                             textBox1.Focus();
                                         }
-                                        else
+                                      else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql1 = "INSERT INTO stitch (c_date, stitch1) VALUES (@c_date, @stitch1)";
-
-                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql1, conn))
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch1) VALUES (@c_date, @stitch1)";
+                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
                                                 insertCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 insertCommand.Parameters.AddWithValue("stitch1", int.Parse(textBox1.Text.Trim()));
@@ -114,25 +117,30 @@ namespace PROCAP_CLIENT
                                 else
                                 {
                                     // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingSql2 = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql2, conn))
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
+                                    string checkExistingdata = "SELECT stitch2 FROM stitch ";
+                                    using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommand.Parameters.AddWithValue("c_date", currentTime);
-
+                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
-                                        int count = Convert.ToInt32(checkCommand.ExecuteScalar());
+                                        int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
-                                            string updateSql2 = "UPDATE stitch SET stitch2 = @stitch2 WHERE c_date = @c_date";
-
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql2, conn))
+                                            if (result != null && result != DBNull.Value)
+                                                MessageBox.Show("今日數據已更新");
+                                            else
+                                                MessageBox.Show("數據提交成功");
+                                            string updateSql = "UPDATE stitch SET stitch2 = @stitch2 WHERE c_date = @c_date";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch2", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            MessageBox.Show("今日数据已更新");
+                                           
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -141,9 +149,8 @@ namespace PROCAP_CLIENT
                                         else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql2 = "INSERT INTO stitch (c_date, stitch2) VALUES (@c_date, @stitch2)";
-
-                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql2, conn))
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch2) VALUES (@c_date, @stitch2)";
+                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
                                                 insertCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 insertCommand.Parameters.AddWithValue("stitch2", int.Parse(textBox1.Text.Trim()));
@@ -168,27 +175,31 @@ namespace PROCAP_CLIENT
                                 }
 
                                 else
-                                {    // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingSql3 = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql3, conn))
+                                {      // 检查数据库中是否已存在相同时间戳的记录
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
+                                    string checkExistingdata = "SELECT stitch3 FROM stitch ";
+                                    using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommand.Parameters.AddWithValue("c_date", currentTime);
-
+                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
-                                        int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-
+                                        int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
-                                            string updateSql3 = "UPDATE stitch SET stitch3 = @stitch3 WHERE c_date = @c_date";
-
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql3, conn))
+                                            if (result != null && result != DBNull.Value)
+                                                MessageBox.Show("今日數據已更新");
+                                            else
+                                                MessageBox.Show("數據提交成功");
+                                            string updateSql = "UPDATE stitch SET stitch3 = @stitch3 WHERE c_date = @c_date";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch3", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            MessageBox.Show("今日数据已更新");
+                                           
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -197,9 +208,8 @@ namespace PROCAP_CLIENT
                                         else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql3 = "INSERT INTO stitch (c_date, stitch3) VALUES (@c_date, @stitch3)";
-
-                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql3, conn))
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch3) VALUES (@c_date, @stitch3)";
+                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
                                                 insertCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 insertCommand.Parameters.AddWithValue("stitch3", int.Parse(textBox1.Text.Trim()));
@@ -224,27 +234,31 @@ namespace PROCAP_CLIENT
                                 }
 
                                 else
-                                {    // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingSql4 = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql4, conn))
+                                {     // 检查数据库中是否已存在相同时间戳的记录
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
+                                    string checkExistingdata = "SELECT stitch4 FROM stitch ";
+                                    using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommand.Parameters.AddWithValue("c_date", currentTime);
-
+                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
-                                        int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-
+                                        int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
-                                            string updateSql4 = "UPDATE stitch SET stitch4 = @stitch4 WHERE c_date = @c_date";
-
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql4, conn))
+                                            if (result != null && result != DBNull.Value)
+                                                MessageBox.Show("今日數據已更新");
+                                            else
+                                                MessageBox.Show("數據提交成功");
+                                            string updateSql = "UPDATE stitch SET stitch4 = @stitch4 WHERE c_date = @c_date";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch4", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            MessageBox.Show("今日数据已更新");
+                                            
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -253,9 +267,8 @@ namespace PROCAP_CLIENT
                                         else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql4 = "INSERT INTO stitch (c_date, stitch4) VALUES (@c_date, @stitch4)";
-
-                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql4, conn))
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch4) VALUES (@c_date, @stitch4)";
+                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
                                                 insertCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 insertCommand.Parameters.AddWithValue("stitch4", int.Parse(textBox1.Text.Trim()));
@@ -280,27 +293,31 @@ namespace PROCAP_CLIENT
                                 }
 
                                 else
-                                {    // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingSql5 = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    using (NpgsqlCommand checkCommand = new NpgsqlCommand(checkExistingSql5, conn))
+                                {      // 检查数据库中是否已存在相同时间戳的记录
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
+                                    string checkExistingdata = "SELECT stitch5 FROM stitch ";
+                                    using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommand.Parameters.AddWithValue("c_date", currentTime);
-
+                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
-                                        int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-
+                                        int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
-                                            string updateSql5 = "UPDATE stitch SET stitch5 = @stitch5 WHERE c_date = @c_date";
-
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql5, conn))
+                                            if (result != null && result != DBNull.Value)
+                                                MessageBox.Show("今日數據已更新");
+                                            else
+                                                MessageBox.Show("數據提交成功");
+                                            string updateSql = "UPDATE stitch SET stitch5 = @stitch5 WHERE c_date = @c_date";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch5", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            MessageBox.Show("今日数据已更新");
+                                            
                                             conn.Close();
                                             textBox1.Text = "";
                                             textBox1.Focus();
@@ -308,9 +325,8 @@ namespace PROCAP_CLIENT
                                         else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql5 = "INSERT INTO stitch (c_date, stitch5) VALUES (@c_date, @stitch5)";
-
-                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql5, conn))
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch5) VALUES (@c_date, @stitch5)";
+                                            using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
                                                 insertCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 insertCommand.Parameters.AddWithValue("stitch5", int.Parse(textBox1.Text.Trim()));
