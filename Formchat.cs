@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,7 +19,7 @@ namespace PROCAP_CLIENT
         public Formchat()
         {
             InitializeComponent();
-
+           
 
         }
 
@@ -35,11 +36,51 @@ namespace PROCAP_CLIENT
         private void Formchat_Load(object sender, EventArgs e)
         {
             timer1.Start();
-           
+            DataGridViewChat();
+        }
+        private void DataGridViewChat()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    string sqlchat = "select c_date,capacity,lean01,lean02,lean03 from cut";
+                    NpgsqlCommand cmd = new NpgsqlCommand(sqlchat, conn);
+                    NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
+                    DataTable dataTable_C = new DataTable();
+                    adp.Fill(dataTable_C);
+                    dataGridView1.DataSource = dataTable_C;
+                    //int startIndex = Math.Max(0, dataTable_C.Rows.Count - 5);
+                    //// 将 DataGridView 滚动到最近的5行数据
+                    //if (dataGridView1.Rows.Count > 0)
+                    //{
+                    //    dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
+                    //    dataGridView1.Rows[startIndex].Selected = true;
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
+        private async Task go()
+        {
+            Prowell_slack_bot.slack.slack_init();
+            await Prowell_slack_bot.slack.post_messageProCap("這是一條測試消息");
         }
 
         private void buttonsubmit_Click(object sender, EventArgs e)
         {
+            //go();
+
+            //if (true)
+            //{
+            //    return;
+            //}
+
             if (string.IsNullOrEmpty(textBox1.Text.Trim()))
             {
                 MessageBox.Show("產量不能為空");
@@ -90,7 +131,7 @@ namespace PROCAP_CLIENT
                                     insertCommand.ExecuteNonQuery();
                                 }
                                 MessageBox.Show("數據提交成功");
-                                conn.Close ();
+                                conn.Close();
                                 textBox1.Text = "";
                             }
                         }

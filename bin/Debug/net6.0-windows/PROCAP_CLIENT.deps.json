@@ -10,7 +10,8 @@
         "dependencies": {
           "Npgsql": "7.0.6",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "7.0.11",
-          "Npgsql.Json.NET": "7.0.6"
+          "Npgsql.Json.NET": "7.0.6",
+          "Prowell_slack_bot": "1.0.0.0"
         },
         "runtime": {
           "PROCAP_CLIENT.dll": {}
@@ -199,7 +200,23 @@
           }
         }
       },
-      "System.Runtime.CompilerServices.Unsafe/6.0.0": {}
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
+      "Prowell_slack_bot/1.0.0.0": {
+        "runtime": {
+          "Prowell_slack_bot.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SlackAPI/1.2.0.0": {
+        "runtime": {
+          "SlackAPI.dll": {
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.2.0.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
@@ -333,6 +350,16 @@
       "sha512": "sha512-/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    },
+    "Prowell_slack_bot/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SlackAPI/1.2.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

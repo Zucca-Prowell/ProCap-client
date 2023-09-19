@@ -37,3 +37,5 @@ D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Microsoft.Extensions
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.Json.NET.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\SlackAPI.dll
+D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Prowell_slack_bot.pdb

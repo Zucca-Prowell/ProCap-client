@@ -14,4 +14,22 @@
     <PackageReference Include="Npgsql.Json.NET" Version="7.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Prowell_slack_bot">
+      <HintPath>bin\Debug\net6.0-windows\Prowell_slack_bot.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Prowell_slack_bot.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SlackAPI.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

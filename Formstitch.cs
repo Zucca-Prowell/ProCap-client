@@ -17,6 +17,36 @@ namespace PROCAP_CLIENT
         public Formstitch()
         {
             InitializeComponent();
+            
+        }
+        private void DataGridViewStitch()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    string sqlstitch = "select c_date,stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,lean2線,lean3線 from stitch";
+                    NpgsqlCommand cmd = new NpgsqlCommand(sqlstitch, conn);
+                    NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
+                    DataTable dataTable_St = new DataTable();
+                    adp.Fill(dataTable_St);
+                    dataGridView1.DataSource = dataTable_St;
+                    int startIndex = Math.Max(0, dataTable_St.Rows.Count - 5);
+
+                    // 将 DataGridView 滚动到最近的5行数据
+                    if (dataGridView1.Rows.Count > 0)
+                    {
+                        dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
+                        dataGridView1.Rows[startIndex].Selected = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -28,6 +58,7 @@ namespace PROCAP_CLIENT
         {
             timer1.Start();
             comboBox1.SelectedIndex = 0;
+            DataGridViewStitch();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -55,7 +86,7 @@ namespace PROCAP_CLIENT
                                 }
 
                                 else
-                                {   
+                                {
                                     // 检查数据库中是否已存在相同时间戳的记录
                                     string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
                                     string checkExistingdata = "SELECT stitch1 FROM stitch ";
@@ -65,7 +96,7 @@ namespace PROCAP_CLIENT
                                         checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
                                         // 检查是否存在相同时间戳的记录
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result=checkCommanddata.ExecuteScalar();
+                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
                                             // 如果存在相同时间戳的记录，执行更新操作
@@ -73,20 +104,20 @@ namespace PROCAP_CLIENT
                                                 MessageBox.Show("今日數據已更新");
                                             else
                                                 MessageBox.Show("數據提交成功");
-                                            string updateSql= "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @c_date";
+                                            string updateSql = "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @c_date";
                                             using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
                                                 updateCommand.Parameters.AddWithValue("stitch1", int.Parse(textBox1.Text.Trim()));
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            
+
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
                                             textBox1.Focus();
                                         }
-                                      else
+                                        else
                                         {
                                             // 如果不存在相同时间戳的记录，执行插入操作
                                             string insertSql = "INSERT INTO stitch (c_date, stitch1) VALUES (@c_date, @stitch1)";
@@ -140,7 +171,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                           
+
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -199,7 +230,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                           
+
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -258,7 +289,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            
+
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -317,7 +348,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-                                            
+
                                             conn.Close();
                                             textBox1.Text = "";
                                             textBox1.Focus();
@@ -359,8 +390,8 @@ namespace PROCAP_CLIENT
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode==Keys.Enter)
-                buttonsubmit_Click(sender, e);  
+            if (e.KeyCode == Keys.Enter)
+                buttonsubmit_Click(sender, e);
         }
     }
 }

@@ -40,7 +40,7 @@
             // 
             // buttonsubmit
             // 
-            buttonsubmit.Location = new Point(292, 297);
+            buttonsubmit.Location = new Point(415, 420);
             buttonsubmit.Name = "buttonsubmit";
             buttonsubmit.Size = new Size(75, 23);
             buttonsubmit.TabIndex = 0;
@@ -50,7 +50,7 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(145, 297);
+            textBox1.Location = new Point(282, 420);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(121, 23);
             textBox1.TabIndex = 1;
@@ -61,7 +61,7 @@
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "組底1組", "組底2組", "組底3組", "組底4組", "組底5組", "組底6組" });
-            comboBox1.Location = new Point(145, 267);
+            comboBox1.Location = new Point(282, 391);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 2;
@@ -70,16 +70,17 @@
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(85, 96);
+            dataGridView1.Location = new Point(65, 50);
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(240, 150);
+            dataGridView1.Size = new Size(550, 320);
             dataGridView1.TabIndex = 3;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(48, 300);
+            label1.Location = new Point(183, 428);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 4;
@@ -93,7 +94,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(456, 450);
+            ClientSize = new Size(684, 461);
             Controls.Add(label1);
             Controls.Add(dataGridView1);
             Controls.Add(comboBox1);

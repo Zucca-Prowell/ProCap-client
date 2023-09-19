@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using Npgsql.Replication.PgOutput.Messages;
+using Prowell_slack_bot;
 
 namespace PROCAP_CLIENT
 {

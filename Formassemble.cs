@@ -336,11 +336,40 @@ namespace PROCAP_CLIENT
                 textBox1.Text = "";
             }
         }
+        private void DataGridViewAssemble()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    string sqlassemble = "select c_date,assemble01,assemble02,assemble03,assemble04,assemble07,lean01,lean02,lean03 from assemble";
+                    NpgsqlCommand cmd = new NpgsqlCommand(sqlassemble, conn);
+                    NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
+                    DataTable dataTable_A = new DataTable();
+                    adp.Fill(dataTable_A);
+                    dataGridView1.DataSource = dataTable_A;
+                    int startIndex = Math.Max(0, dataTable_A.Rows.Count - 5);
 
+                    // 将 DataGridView 滚动到最近的5行数据
+                    if (dataGridView1.Rows.Count > 0)
+                    {
+                        dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
+                        dataGridView1.Rows[startIndex].Selected = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
         private void Formassemble_Load(object sender, EventArgs e)
         {
             comboBox1.SelectedIndex = 0;
             timer1.Start();
+            DataGridViewAssemble();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -356,7 +385,7 @@ namespace PROCAP_CLIENT
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode==Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
                 buttonsubmit_Click(sender, e);
         }
     }

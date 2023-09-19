@@ -395,8 +395,37 @@ namespace PROCAP_CLIENT
         {
             timer1.Start();
             comboBox1.SelectedIndex = 0;
+            DataGridViewSole();
         }
+        private void DataGridViewSole()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    string sqlsole = "select c_date,sole1,sole2,sole3,sole4,sole5,sole6 from sole";
+                    NpgsqlCommand cmd = new NpgsqlCommand(sqlsole, conn);
+                    NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
+                    DataTable dataTable_So = new DataTable();
+                    adp.Fill(dataTable_So);
+                    dataGridView1.DataSource = dataTable_So;
+                    int startIndex = Math.Max(0, dataTable_So.Rows.Count - 5);
 
+                    // 将 DataGridView 滚动到最近的5行数据
+                    if (dataGridView1.Rows.Count > 0)
+                    {
+                        dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
+                        dataGridView1.Rows[startIndex].Selected = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
         private void timer1_Tick(object sender, EventArgs e)
         {
             label1.Text = DateTime.Now.ToString("yyyy-MM-dd" + "產量");
@@ -415,8 +444,8 @@ namespace PROCAP_CLIENT
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode==Keys.Enter)
-                buttonsubmit_Click(sender, e);  
+            if (e.KeyCode == Keys.Enter)
+                buttonsubmit_Click(sender, e);
         }
     }
 }

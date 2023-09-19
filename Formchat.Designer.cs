@@ -40,16 +40,17 @@
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(12, 12);
+            dataGridView1.Location = new Point(65, 50);
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(240, 150);
+            dataGridView1.Size = new Size(550, 320);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
             // buttonsubmit
             // 
-            buttonsubmit.Location = new Point(274, 225);
+            buttonsubmit.Location = new Point(393, 403);
             buttonsubmit.Name = "buttonsubmit";
             buttonsubmit.Size = new Size(75, 25);
             buttonsubmit.TabIndex = 2;
@@ -61,7 +62,7 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = SystemColors.ButtonFace;
-            label1.Location = new Point(51, 227);
+            label1.Location = new Point(172, 411);
             label1.Name = "label1";
             label1.Size = new Size(47, 15);
             label1.TabIndex = 3;
@@ -69,7 +70,7 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(152, 225);
+            textBox1.Location = new Point(259, 403);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 1;
@@ -83,7 +84,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(386, 450);
+            ClientSize = new Size(684, 461);
             Controls.Add(textBox1);
             Controls.Add(label1);
             Controls.Add(buttonsubmit);
@@ -104,6 +105,6 @@
         private Button buttonsubmit;
         private Label label1;
         protected internal TextBox textBox1;
-         protected internal System.Windows.Forms.Timer timer1;
+        protected internal System.Windows.Forms.Timer timer1;
     }
 }

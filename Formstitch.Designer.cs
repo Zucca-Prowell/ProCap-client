@@ -40,7 +40,7 @@
             // 
             // buttonsubmit
             // 
-            buttonsubmit.Location = new Point(334, 310);
+            buttonsubmit.Location = new Point(407, 416);
             buttonsubmit.Name = "buttonsubmit";
             buttonsubmit.Size = new Size(75, 23);
             buttonsubmit.TabIndex = 0;
@@ -51,7 +51,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(116, 314);
+            label1.Location = new Point(186, 424);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 1;
@@ -59,7 +59,7 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(211, 310);
+            textBox1.Location = new Point(278, 416);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(100, 23);
             textBox1.TabIndex = 2;
@@ -68,18 +68,20 @@
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(145, 64);
+            dataGridView1.Location = new Point(65, 50);
             dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(240, 150);
+            dataGridView1.Size = new Size(550, 320);
             dataGridView1.TabIndex = 3;
+           
             // 
             // comboBox1
             // 
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "針一課", "針二課", "針三課", "針四課", "針五課" });
-            comboBox1.Location = new Point(211, 281);
+            comboBox1.Location = new Point(278, 387);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(100, 23);
             comboBox1.TabIndex = 4;
@@ -93,7 +95,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(463, 450);
+            ClientSize = new Size(684, 461);
             Controls.Add(comboBox1);
             Controls.Add(dataGridView1);
             Controls.Add(textBox1);
