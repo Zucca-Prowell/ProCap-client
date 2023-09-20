@@ -23,6 +23,113 @@ namespace PROCAP_CLIENT
         {
             InitializeComponent();
         }
+        private async Task go(string message)
+        {
+            Prowell_slack_bot.slack.slack_init();
+            await Prowell_slack_bot.slack.post_messageProCap(message);
+
+        }
+        private async Task gogo1()
+        {
+            string message1;
+            string message2;
+            string message3;
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string leanchat = "select lean01,lean02,lean03 from cut where c_date=@currentTime";
+                
+                using (NpgsqlCommand cmd1 = new NpgsqlCommand(leanchat, conn))
+                
+                {
+                    cmd1.Parameters.AddWithValue("@currentTime", currentTime);
+                   
+                    using (NpgsqlDataReader reader1 = cmd1.ExecuteReader())
+                    
+                    {
+                        while (reader1.Read())
+                        {
+                            Dictionary<string, object> row1 = new Dictionary<string, object>();
+                            for (int i = 0; i < reader1.FieldCount; i++)
+                            {
+                                string columnName = reader1.GetName(i);
+                                object columnValue = reader1[i];
+                                row1[columnName] = columnValue;
+                            }
+                            message1 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線裁加產量:    " + "\n" + "lean01:   " + row1["lean01"] + "\n" + "lean02:   " + row1["lean02"] + "\n" + "lean03:   " + row1["lean03"];
+                            go(message1);
+                        }
+                        
+                        
+                    }
+                }
+            }
+        }
+        private async Task gogo2()
+        {
+            string message2;
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string leanstitch = "select lean1線,lean2線,lean3線 from stitch where c_date=@currentTime";
+                using (NpgsqlCommand cmd2 = new NpgsqlCommand(leanstitch, conn))
+                {
+                    cmd2.Parameters.AddWithValue("@currentTime", currentTime);
+                    using (NpgsqlDataReader reader2 = cmd2.ExecuteReader())
+                    {
+                        while (reader2.Read())
+                        {
+                            Dictionary<string, object> row2 = new Dictionary<string, object>();
+                            for (int i = 0; i < reader2.FieldCount; i++)
+                            {
+                                string columnName = reader2.GetName(i);
+                                object columnValue = reader2[i];
+                                row2[columnName] = columnValue;
+                            }
+                            message2 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線針車產量:    " + "\n" + "lean1線:   " + row2["lean1線"] + "\n" + "lean2線:   " + row2["lean2線"]+ "\n" + "lean3線:   " + row2["lean3線"];
+                            go(message2);
+                        }
+
+
+                    }
+                }
+            }
+
+        }
+        private async Task gogo3()
+        {
+            string message3;
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string leanassemble = "select lean01,lean02,lean03 from assemble where c_date=@currentTime";
+                using (NpgsqlCommand cmd3 = new NpgsqlCommand(leanassemble, conn))
+                {
+                    cmd3.Parameters.AddWithValue("@currentTime", currentTime);
+                    using (NpgsqlDataReader reader3 = cmd3.ExecuteReader())
+                    {
+                        while (reader3.Read())
+                        {
+                            Dictionary<string, object> row3 = new Dictionary<string, object>();
+                            for (int i = 0; i < reader3.FieldCount; i++)
+                            {
+                                string columnName = reader3.GetName(i);
+                                object columnValue = reader3[i];
+                                row3[columnName] = columnValue;
+                            }
+                            message3 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線成型產量:    " + "\n" + "lean01:   " + row3["lean01"] + "\n" + "lean02:   " + row3["lean02"] + "\n" + "lean03:   " + row3["lean03"];
+                            go(message3);
+                        }
+                    }
+                }
+            }
+        }
         private void Formlean_Load(object sender, EventArgs e)
         {
 
@@ -688,6 +795,14 @@ namespace PROCAP_CLIENT
                 a.Text = "";
             }
             textBoxchat.Focus();
+        }
+
+        private void buttonmessage_Click(object sender, EventArgs e)
+        {
+            gogo1();
+            gogo2();
+            gogo3();
+            MessageBox.Show("lean線今日產量發送成功！");
         }
     }
 }

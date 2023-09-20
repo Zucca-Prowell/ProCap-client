@@ -48,6 +48,7 @@
             label6 = new Label();
             label7 = new Label();
             buttonclear = new Button();
+            buttonmessage = new Button();
             SuspendLayout();
             // 
             // buttonsubmit
@@ -215,11 +216,22 @@
             buttonclear.UseVisualStyleBackColor = true;
             buttonclear.Click += buttonclear_Click;
             // 
+            // buttonmessage
+            // 
+            buttonmessage.Location = new Point(69, 328);
+            buttonmessage.Name = "buttonmessage";
+            buttonmessage.Size = new Size(75, 23);
+            buttonmessage.TabIndex = 19;
+            buttonmessage.Text = "發送";
+            buttonmessage.UseVisualStyleBackColor = true;
+            buttonmessage.Click += buttonmessage_Click;
+            // 
             // Formlean
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(232, 343);
+            ClientSize = new Size(232, 361);
+            Controls.Add(buttonmessage);
             Controls.Add(buttonclear);
             Controls.Add(label7);
             Controls.Add(label6);
@@ -267,5 +279,6 @@
         private Label label7;
         protected internal TextBox textBoxchat;
         private Button buttonclear;
+        private Button buttonmessage;
     }
 }

@@ -35,6 +35,7 @@
             dataGridView1 = new DataGridView();
             comboBox1 = new ComboBox();
             timer1 = new System.Windows.Forms.Timer(components);
+            buttonmessage = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -74,7 +75,6 @@
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.Size = new Size(550, 320);
             dataGridView1.TabIndex = 3;
-           
             // 
             // comboBox1
             // 
@@ -91,11 +91,22 @@
             // 
             timer1.Tick += timer1_Tick;
             // 
+            // buttonmessage
+            // 
+            buttonmessage.Location = new Point(407, 387);
+            buttonmessage.Name = "buttonmessage";
+            buttonmessage.Size = new Size(75, 23);
+            buttonmessage.TabIndex = 5;
+            buttonmessage.Text = "發送";
+            buttonmessage.UseVisualStyleBackColor = true;
+            buttonmessage.Click += buttonmessage_Click;
+            // 
             // Formstitch
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 461);
+            Controls.Add(buttonmessage);
             Controls.Add(comboBox1);
             Controls.Add(dataGridView1);
             Controls.Add(textBox1);
@@ -119,5 +130,6 @@
         private ComboBox comboBox1;
         private System.Windows.Forms.Timer timer1;
         protected internal TextBox textBox1;
+        private Button buttonmessage;
     }
 }

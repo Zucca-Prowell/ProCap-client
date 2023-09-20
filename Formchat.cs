@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Npgsql;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
+
 namespace PROCAP_CLIENT
 {
     public partial class Formchat : Form
@@ -19,7 +20,7 @@ namespace PROCAP_CLIENT
         public Formchat()
         {
             InitializeComponent();
-           
+
 
         }
 
@@ -52,13 +53,7 @@ namespace PROCAP_CLIENT
                     DataTable dataTable_C = new DataTable();
                     adp.Fill(dataTable_C);
                     dataGridView1.DataSource = dataTable_C;
-                    //int startIndex = Math.Max(0, dataTable_C.Rows.Count - 5);
-                    //// 将 DataGridView 滚动到最近的5行数据
-                    //if (dataGridView1.Rows.Count > 0)
-                    //{
-                    //    dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
-                    //    dataGridView1.Rows[startIndex].Selected = true;
-                    //}
+
                 }
             }
             catch (Exception ex)
@@ -66,21 +61,16 @@ namespace PROCAP_CLIENT
                 MessageBox.Show("數據庫連接失敗: " + ex.Message);
             }
         }
-        private async Task go()
+        private async Task go(string message)
         {
             Prowell_slack_bot.slack.slack_init();
-            await Prowell_slack_bot.slack.post_messageProCap("這是一條測試消息");
+            await Prowell_slack_bot.slack.post_messageProCap(message);
+
         }
 
         private void buttonsubmit_Click(object sender, EventArgs e)
         {
-            //go();
-
-            //if (true)
-            //{
-            //    return;
-            //}
-
+           
             if (string.IsNullOrEmpty(textBox1.Text.Trim()))
             {
                 MessageBox.Show("產量不能為空");
@@ -116,6 +106,7 @@ namespace PROCAP_CLIENT
                                     updateCommand.ExecuteNonQuery();
                                 }
                                 MessageBox.Show("今日数据已更新");
+                                DataGridViewChat();
                                 conn.Close();
                                 textBox1.Text = "";
                             }
@@ -131,6 +122,7 @@ namespace PROCAP_CLIENT
                                     insertCommand.ExecuteNonQuery();
                                 }
                                 MessageBox.Show("數據提交成功");
+                                DataGridViewChat();
                                 conn.Close();
                                 textBox1.Text = "";
                             }
@@ -159,6 +151,43 @@ namespace PROCAP_CLIENT
             {
                 Close();
             }
+        }
+        private async Task gogo()
+        {
+            string message;
+
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string assemblemessage = "select capacity from cut where c_date=@currentTime";
+                using (NpgsqlCommand cmd = new NpgsqlCommand(assemblemessage, conn))
+                {
+                    cmd.Parameters.AddWithValue("@currentTime", currentTime);
+                    using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                string columnName = reader.GetName(i);
+                                object columnValue = reader[i];
+                                row[columnName] = columnValue;
+                            }
+                            message = DateTime.Now.ToString("yyyy-MM-dd")+"裁加產量:    "+"\n"+"capacity:" + row["capacity"];
+                            go(message);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void buttonmessage_Click(object sender, EventArgs e)
+        {
+            gogo();
+            MessageBox.Show("裁加今日產量發送成功！");
         }
     }
 }

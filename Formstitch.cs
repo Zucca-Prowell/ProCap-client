@@ -17,7 +17,44 @@ namespace PROCAP_CLIENT
         public Formstitch()
         {
             InitializeComponent();
-            
+
+        }
+        private async Task go(string message)
+        {
+            Prowell_slack_bot.slack.slack_init();
+            await Prowell_slack_bot.slack.post_messageProCap(message);
+        }
+        private async Task gogo()
+        {
+            int temp;
+            string message;
+
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string assemblemessage = "select stitch1,stitch2,stitch3,stitch4,stitch5 from stitch where c_date=@currentTime";
+                using (NpgsqlCommand cmd = new NpgsqlCommand(assemblemessage, conn))
+                {
+                    cmd.Parameters.AddWithValue("@currentTime", currentTime);
+                    using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                string columnName = reader.GetName(i);
+                                object columnValue = reader[i];
+                                row[columnName] = columnValue;
+                            }
+                            message = DateTime.Now.ToString("yyyy-MM-dd") + "針車產量:" + "\n" + "stitch1:   " + row["stitch1"] + "\n" + "stitch2:   " + row["stitch2"] + "\n" + "stitch3:   " + row["stitch3"] + "\n" + "stitch4:   " + row["stitch4"] + "\n" + "stitch5:   " + row["stitch5"];
+                            go(message);
+                        }
+                    }
+                }
+            }
         }
         private void DataGridViewStitch()
         {
@@ -33,14 +70,7 @@ namespace PROCAP_CLIENT
                     DataTable dataTable_St = new DataTable();
                     adp.Fill(dataTable_St);
                     dataGridView1.DataSource = dataTable_St;
-                    int startIndex = Math.Max(0, dataTable_St.Rows.Count - 5);
 
-                    // 将 DataGridView 滚动到最近的5行数据
-                    if (dataGridView1.Rows.Count > 0)
-                    {
-                        dataGridView1.FirstDisplayedScrollingRowIndex = startIndex;
-                        dataGridView1.Rows[startIndex].Selected = true;
-                    }
                 }
             }
             catch (Exception ex)
@@ -111,7 +141,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -128,6 +158,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -171,7 +202,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -188,6 +219,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -230,7 +262,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -247,6 +279,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -289,7 +322,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -306,6 +339,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
@@ -348,7 +382,7 @@ namespace PROCAP_CLIENT
                                                 updateCommand.Parameters.AddWithValue("c_date", currentTime);
                                                 updateCommand.ExecuteNonQuery();
                                             }
-
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             textBox1.Focus();
@@ -364,6 +398,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";
                                             textBox1.Focus();
@@ -392,6 +427,12 @@ namespace PROCAP_CLIENT
         {
             if (e.KeyCode == Keys.Enter)
                 buttonsubmit_Click(sender, e);
+        }
+
+        private void buttonmessage_Click(object sender, EventArgs e)
+        {
+            gogo();
+            MessageBox.Show("針車今日產量發送成功！");
         }
     }
 }

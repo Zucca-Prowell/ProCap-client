@@ -35,6 +35,7 @@
             dataGridView1 = new DataGridView();
             label1 = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
+            buttonmessage = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -90,11 +91,22 @@
             // 
             timer1.Tick += timer1_Tick;
             // 
+            // buttonmessage
+            // 
+            buttonmessage.Location = new Point(415, 391);
+            buttonmessage.Name = "buttonmessage";
+            buttonmessage.Size = new Size(75, 23);
+            buttonmessage.TabIndex = 5;
+            buttonmessage.Text = "發送";
+            buttonmessage.UseVisualStyleBackColor = true;
+            buttonmessage.Click += buttonmessage_Click;
+            // 
             // Formsole
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 461);
+            Controls.Add(buttonmessage);
             Controls.Add(label1);
             Controls.Add(dataGridView1);
             Controls.Add(comboBox1);
@@ -118,5 +130,6 @@
         private Label label1;
         private System.Windows.Forms.Timer timer1;
         protected internal TextBox textBox1;
+        private Button buttonmessage;
     }
 }

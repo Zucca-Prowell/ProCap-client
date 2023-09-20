@@ -30,7 +30,6 @@
         {
             buttonadd = new Button();
             buttonsearch = new Button();
-            buttonmodify = new Button();
             comboBoxdp = new ComboBox();
             textBoxsearch = new TextBox();
             dataGridView1 = new DataGridView();
@@ -57,21 +56,11 @@
             buttonsearch.UseVisualStyleBackColor = true;
             buttonsearch.Click += buttonsearch_Click;
             // 
-            // buttonmodify
-            // 
-            buttonmodify.Location = new Point(677, 198);
-            buttonmodify.Name = "buttonmodify";
-            buttonmodify.Size = new Size(75, 23);
-            buttonmodify.TabIndex = 2;
-            buttonmodify.Text = "修改";
-            buttonmodify.UseVisualStyleBackColor = true;
-            buttonmodify.Click += buttonmodify_Click;
-            // 
             // comboBoxdp
             // 
             comboBoxdp.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxdp.FormattingEnabled = true;
-            comboBoxdp.Items.AddRange(new object[] { "裁加", "針車", "組底", "成型", "Lean線" });
+            comboBoxdp.Items.AddRange(new object[] { "裁加", "針車", "組底", "成型", "lean線" });
             comboBoxdp.Location = new Point(550, 141);
             comboBoxdp.Name = "comboBoxdp";
             comboBoxdp.Size = new Size(121, 23);
@@ -83,6 +72,7 @@
             textBoxsearch.Name = "textBoxsearch";
             textBoxsearch.Size = new Size(121, 23);
             textBoxsearch.TabIndex = 4;
+            textBoxsearch.KeyDown += textBoxsearch_KeyDown;
             // 
             // dataGridView1
             // 
@@ -102,7 +92,6 @@
             Controls.Add(dataGridView1);
             Controls.Add(textBoxsearch);
             Controls.Add(comboBoxdp);
-            Controls.Add(buttonmodify);
             Controls.Add(buttonsearch);
             Controls.Add(buttonadd);
             Name = "Formmain";
@@ -117,7 +106,6 @@
 
         private Button buttonadd;
         private Button buttonsearch;
-        private Button buttonmodify;
         private TextBox textBoxsearch;
         private DataGridView dataGridView1;
         protected internal ComboBox comboBoxdp;
