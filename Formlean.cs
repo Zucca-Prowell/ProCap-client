@@ -11,7 +11,9 @@ namespace PROCAP_CLIENT
 {
     public partial class Formlean : Form
     {
-
+        public static int lean1chat;
+        public static int lean2chat;
+        public static int lean3chat;
         TextBox[] textcheck = new TextBox[6];
         bool[] boolarray = new bool[9];
         bool judgement = false;
@@ -19,17 +21,18 @@ namespace PROCAP_CLIENT
         bool flag = false;
         bool result = false;
         int counted;
+       
         public Formlean()
         {
             InitializeComponent();
         }
-        private async Task go(string message)
+        protected internal async Task go(string message)
         {
             Prowell_slack_bot.slack.slack_init();
             await Prowell_slack_bot.slack.post_messageProCap(message);
 
         }
-        private async Task gogo1()
+        protected internal async Task gogo1()
         {
             string message1;
             string message2;
@@ -58,17 +61,19 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader1[i];
                                 row1[columnName] = columnValue;
                             }
-                            message1 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線裁加產量:    " + "\n" + "lean01:   " + row1["lean01"] + "\n" + "lean02:   " + row1["lean02"] + "\n" + "lean03:   " + row1["lean03"];
+                             lean1chat = (int)row1["lean01"];
+                            //lean2chat = (int)row1["lean02"];//lean2線開了解除注釋
+                            //lean3chat = (int)row1["lean03"];//lean3線開了解除注釋
+                            message1 =  "Lean1線產量:   " + row1["lean01"] + "雙" ; //+ "Lean2線產量:   " + row1["lean02"] + "雙" + "\n" + "Lean3線產量:   " + row1["lean03"] + "雙"+"\n";
                             go(message1);
                         }
-                        
-                        
                     }
                 }
             }
         }
-        private async Task gogo2()
+        protected internal async Task gogo2()
         {
+            int sum;
             string message2;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
@@ -90,7 +95,8 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader2[i];
                                 row2[columnName] = columnValue;
                             }
-                            message2 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線針車產量:    " + "\n" + "lean1線:   " + row2["lean1線"] + "\n" + "lean2線:   " + row2["lean2線"]+ "\n" + "lean3線:   " + row2["lean3線"];
+                            sum = (int)row2["lean1線"];//+(int)row2["lean2線"]+(int)row2["lean3線"];
+                            message2 = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd")+"Lean" + "產量如下:" + "\n" + "Lean1線針車:      " + row2["lean1線"]+"雙" /*+ "\n" + "Lean2線針車:   " + row2["lean2線"]+ "\n" + "Lean3線針車:   " + row2["lean3線"]*/+"\n"+"   合計:         "+sum+"雙";
                             go(message2);
                         }
 
@@ -100,7 +106,7 @@ namespace PROCAP_CLIENT
             }
 
         }
-        private async Task gogo3()
+        protected internal async Task gogo3()
         {
             string message3;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
@@ -123,7 +129,7 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader3[i];
                                 row3[columnName] = columnValue;
                             }
-                            message3 = DateTime.Now.ToString("yyyy-MM-dd") + "lean線成型產量:    " + "\n" + "lean01:   " + row3["lean01"] + "\n" + "lean02:   " + row3["lean02"] + "\n" + "lean03:   " + row3["lean03"];
+                            message3 = "Lean1線成型產量:    " + row3["lean01"] + "雙";//+ "\n" + "lean02:   " + row3["lean02"] + "\n" + "lean03:   " + row3["lean03"];
                             go(message3);
                         }
                     }
@@ -215,9 +221,6 @@ namespace PROCAP_CLIENT
                         DateTime currentTime = DateTime.Now.Date;
                         if (radioButtonlean1.Checked)
                         {
-                            //該lean線針車與大線針車合並
-                            //lean裁加與大線裁加合併
-                            //lean成型數據直接放進assemble表裡
                             string checkExistingdate_C = "SELECT COUNT(*) FROM cut WHERE c_date=@c_date";
                             string checkExistingdata_C = "SELECT lean01 FROM cut";
                             string checkExistingdate_S = "SELECT COUNT(*) FROM stitch WHERE c_date=@c_date";
@@ -548,7 +551,6 @@ namespace PROCAP_CLIENT
                             }
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -799,7 +801,6 @@ namespace PROCAP_CLIENT
 
         private void buttonmessage_Click(object sender, EventArgs e)
         {
-            gogo1();
             gogo2();
             gogo3();
             MessageBox.Show("lean線今日產量發送成功！");

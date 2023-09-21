@@ -27,7 +27,7 @@ namespace PROCAP_CLIENT
         {
             int temp;
             string message;
-            
+            int sum = 0;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
@@ -48,7 +48,8 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader[i];
                                 row[columnName] = columnValue;
                             }
-                            message = DateTime.Now.ToString("yyyy-MM-dd") + "成型產量:" + "\n"+"assemble01:   " +row["assemble01"]+"\n"+ "assemble02:   " + row["assemble02"] + "\n" + "assemble03:   " + row["assemble03"] + "\n" + "assemble04:   " + row["assemble04"] + "\n" + "assemble07:   " + row["assemble07"];
+                            sum = (int)row["assemble01"] +(int)row["assemble02"] + (int)row["assemble03"] + (int)row["assemble04"] + (int)row["assemble07"];
+                            message = "大家好！"+DateTime.Now.ToString("yyyy-MM-dd") + "成型課產量如下:" + "\n"+"成1組:   " +row["assemble01"]+"雙"+"\n"+ "成2組:   " + row["assemble02"] + "雙" + "\n" + "成3組:   " + row["assemble03"] + "雙" + "\n" + "成4組:   " + row["assemble04"] + "雙" + "\n" + "成7組:   " + row["assemble07"] + "雙"+"\n"+" 合計:    "+sum+"雙";
                             go(message);
                         }
                     }
@@ -78,53 +79,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {  // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT assemble01 FROM assemble ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE assemble SET assemble01 = @assemble01 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT assemble01 FROM assemble WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("assemble01", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble01 = @assemble01 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble01", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble01 = @assemble01 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble01", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewAssemble();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO assemble (c_date, assemble01) VALUES (@c_date, @assemble01)";
+                                            string insertSql = "INSERT INTO assemble (c_date, assemble01) VALUES (@currentTime, @assemble01)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("assemble01", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@assemble01", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewAssemble();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -138,53 +155,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {   // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT assemble02 FROM assemble ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE assemble SET assemble02 = @assemble02 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT assemble02 FROM assemble WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("assemble02", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble02 = @assemble02 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble02", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble02 = @assemble02 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble02", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewAssemble();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO assemble (c_date, assemble02) VALUES (@c_date, @assemble02)";
+                                            string insertSql = "INSERT INTO assemble (c_date, assemble02) VALUES (@currentTime, @assemble02)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("assemble02", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@assemble02", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewAssemble();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -198,53 +231,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {  // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT assemble03 FROM assemble ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE assemble SET assemble03 = @assemble03 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT assemble03 FROM assemble WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("assemble03", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble03 = @assemble03 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble03", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble03 = @assemble03 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble03", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewAssemble();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO assemble (c_date, assemble03) VALUES (@c_date, @assemble03)";
+                                            string insertSql = "INSERT INTO assemble (c_date, assemble03) VALUES (@currentTime, @assemble03)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("assemble03", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@assemble03", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewAssemble();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -258,53 +307,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {  // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT assemble04 FROM assemble ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE assemble SET assemble04 = @assemble04 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT assemble04 FROM assemble WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("assemble04", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble04 = @assemble04 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble04", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble04 = @assemble04 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble04", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewAssemble();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO assemble (c_date, assemble04) VALUES (@c_date, @assemble04)";
+                                            string insertSql = "INSERT INTO assemble (c_date, assemble04) VALUES (@currentTime, @assemble04)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("assemble04", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@assemble04", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewAssemble();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -318,45 +383,60 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {   // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT assemble07 FROM assemble ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE assemble SET assemble07 = @assemble07 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT assemble07 FROM assemble WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("assemble07", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble07 = @assemble07 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble07", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE assemble SET assemble07 = @assemble07 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@assemble07", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewAssemble();
+                                                    conn.Close();
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewAssemble();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO assemble (c_date, assemble07) VALUES (@c_date, @assemble07)";
+                                            string insertSql = "INSERT INTO assemble (c_date, assemble07) VALUES (@currentTime, @assemble07)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("assemble07", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@assemble07", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");

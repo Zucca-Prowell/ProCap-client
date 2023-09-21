@@ -28,7 +28,7 @@ namespace PROCAP_CLIENT
         {
             int temp;
             string message;
-
+            int sum = 0;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
@@ -49,7 +49,13 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader[i];
                                 row[columnName] = columnValue;
                             }
-                            message = DateTime.Now.ToString("yyyy-MM-dd") + "針車產量:" + "\n" + "stitch1:   " + row["stitch1"] + "\n" + "stitch2:   " + row["stitch2"] + "\n" + "stitch3:   " + row["stitch3"] + "\n" + "stitch4:   " + row["stitch4"] + "\n" + "stitch5:   " + row["stitch5"];
+                            int num1 = (int)row["stitch1"];
+                            int num2 = (int)row["stitch2"];
+                            int num3 = (int)row["stitch3"];
+                            int num4 = (int)row["stitch4"];
+                            int num5 = (int)row["stitch5"];
+                            sum = num1+ num2+ num3+ num4+ num5;
+                            message ="大家好！"+ DateTime.Now.ToString("yyyy-MM-dd") + "針車產量如下:" + "\n" + "針一課:   " + row["stitch1"]+"雙" + "\n" + "針二課:   " + row["stitch2"] + "雙" + "\n" + "針三課:   " + row["stitch3"] + "雙" + "\n" + "針四課:   " + row["stitch4"] + "雙" + "\n" + "針五課:   " + row["stitch5"] + "雙" + "\n"+" 合計:     "+sum+"雙";
                             go(message);
                         }
                     }
@@ -90,12 +96,10 @@ namespace PROCAP_CLIENT
             comboBox1.SelectedIndex = 0;
             DataGridViewStitch();
         }
-
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             textBox1.Focus();
         }
-
         private void buttonsubmit_Click(object sender, EventArgs e)
         {
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
@@ -114,54 +118,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
                                 {
-                                    // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT stitch1 FROM stitch ";
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT stitch1 FROM stitch WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("stitch1", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch1", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch1 = @stitch1 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch1", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewStitch();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO stitch (c_date, stitch1) VALUES (@c_date, @stitch1)";
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch1) VALUES (@currentTime, @stitch1)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("stitch1", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@stitch1", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewStitch();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -175,54 +194,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
                                 {
-                                    // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT stitch2 FROM stitch ";
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE stitch SET stitch2 = @stitch2 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT stitch2 FROM stitch WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("stitch2", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch2 = @stitch2 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch2", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch2 = @stitch2 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch2", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewStitch();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO stitch (c_date, stitch2) VALUES (@c_date, @stitch2)";
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch2) VALUES (@currentTime, @stitch2)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("stitch2", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@stitch2", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewStitch();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -236,53 +270,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {      // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT stitch3 FROM stitch ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE stitch SET stitch3 = @stitch3 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT stitch3 FROM stitch WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("stitch3", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch3 = @stitch3 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch3", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch3 = @stitch3 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch3", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewStitch();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO stitch (c_date, stitch3) VALUES (@c_date, @stitch3)";
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch3) VALUES (@currentTime, @stitch3)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("stitch3", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@stitch3", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewStitch();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -296,53 +346,69 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {     // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT stitch4 FROM stitch ";
+                                {
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE stitch SET stitch4 = @stitch4 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT stitch4 FROM stitch WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("stitch4", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch4 = @stitch4 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch4", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch4 = @stitch4 WHERE c_date=@currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch4", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    comboBox1.SelectedIndex++;
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewStitch();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            comboBox1.SelectedIndex++;
-                                            textBox1.Focus();
                                         }
+
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO stitch (c_date, stitch4) VALUES (@c_date, @stitch4)";
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch4) VALUES (@currentTime, @stitch4)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("stitch4", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@stitch4", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
                                             DataGridViewStitch();
                                             conn.Close();
-                                            textBox1.Text = "";
                                             comboBox1.SelectedIndex++;
+                                            textBox1.Text = "";
                                             textBox1.Focus();
                                         }
                                     }
@@ -356,45 +422,59 @@ namespace PROCAP_CLIENT
                                     MessageBox.Show("產量不能為空");
                                     textBox1.Focus();
                                 }
-
                                 else
-                                {      // 检查数据库中是否已存在相同时间戳的记录
-                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @c_date";
-                                    string checkExistingdata = "SELECT stitch5 FROM stitch ";
+                                {      
+                                    string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
-                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        checkCommanddate.Parameters.AddWithValue("c_date", currentTime);
-                                        // 检查是否存在相同时间戳的记录
+                                        checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
                                         int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                        object result = checkCommanddata.ExecuteScalar();
                                         if (count > 0)
                                         {
-                                            // 如果存在相同时间戳的记录，执行更新操作
-                                            if (result != null && result != DBNull.Value)
-                                                MessageBox.Show("今日數據已更新");
-                                            else
-                                                MessageBox.Show("數據提交成功");
-                                            string updateSql = "UPDATE stitch SET stitch5 = @stitch5 WHERE c_date = @c_date";
-                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            string checkExistingdata = "SELECT stitch5 FROM stitch WHERE c_date=@currentTime ";
+                                            using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                             {
-                                                updateCommand.Parameters.AddWithValue("stitch5", int.Parse(textBox1.Text.Trim()));
-                                                updateCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                updateCommand.ExecuteNonQuery();
+                                                checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                                object result = checkCommanddata.ExecuteScalar();
+                                                if ((count > 0) && (result != null && result != DBNull.Value))
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch5 = @stitch5 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch5", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("今日數據已更新");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
+                                                else
+                                                {
+                                                    string updateSql = "UPDATE stitch SET stitch5 = @stitch5 WHERE c_date = @currentTime";
+                                                    using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                                    {
+                                                        updateCommand.Parameters.AddWithValue("@stitch5", int.Parse(textBox1.Text.Trim()));
+                                                        updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                        updateCommand.ExecuteNonQuery();
+                                                    }
+                                                    MessageBox.Show("數據提交成功");
+                                                    DataGridViewStitch();
+                                                    conn.Close();
+                                                    textBox1.Text = "";
+                                                    textBox1.Focus();
+                                                }
                                             }
-                                            DataGridViewStitch();
-                                            conn.Close();
-                                            textBox1.Text = "";
-                                            textBox1.Focus();
                                         }
                                         else
                                         {
-                                            // 如果不存在相同时间戳的记录，执行插入操作
-                                            string insertSql = "INSERT INTO stitch (c_date, stitch5) VALUES (@c_date, @stitch5)";
+                                            string insertSql = "INSERT INTO stitch (c_date, stitch5) VALUES (@currentTime, @stitch5)";
                                             using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
                                             {
-                                                insertCommand.Parameters.AddWithValue("c_date", currentTime);
-                                                insertCommand.Parameters.AddWithValue("stitch5", int.Parse(textBox1.Text.Trim()));
+                                                insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                insertCommand.Parameters.AddWithValue("@stitch5", int.Parse(textBox1.Text.Trim()));
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
