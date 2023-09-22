@@ -21,7 +21,7 @@ namespace PROCAP_CLIENT
         bool flag = false;
         bool result = false;
         int counted;
-       
+
         public Formlean()
         {
             InitializeComponent();
@@ -35,22 +35,20 @@ namespace PROCAP_CLIENT
         protected internal async Task gogo1()
         {
             string message1;
-            string message2;
-            string message3;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 DateTime currentTime = DateTime.Now.Date;
                 conn.Open();
                 string leanchat = "select lean01,lean02,lean03 from cut where c_date=@currentTime";
-                
+
                 using (NpgsqlCommand cmd1 = new NpgsqlCommand(leanchat, conn))
-                
+
                 {
                     cmd1.Parameters.AddWithValue("@currentTime", currentTime);
-                   
+
                     using (NpgsqlDataReader reader1 = cmd1.ExecuteReader())
-                    
+
                     {
                         while (reader1.Read())
                         {
@@ -61,10 +59,13 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader1[i];
                                 row1[columnName] = columnValue;
                             }
-                             lean1chat = (int)row1["lean01"];
-                            //lean2chat = (int)row1["lean02"];//lean2線開了解除注釋
-                            //lean3chat = (int)row1["lean03"];//lean3線開了解除注釋
-                            message1 =  "Lean1線產量:   " + row1["lean01"] + "雙" ; //+ "Lean2線產量:   " + row1["lean02"] + "雙" + "\n" + "Lean3線產量:   " + row1["lean03"] + "雙"+"\n";
+                            if (row1["lean01"] is int intValue)
+                                lean1chat = intValue;
+                            else
+                                lean1chat = 0;
+                            //lean2chat = (int?)row1["lean02"]??0;//lean2線開了解除注釋
+                            //lean3chat = (int?)row1["lean03"]??0;//lean3線開了解除注釋
+                            message1 = "Lean1線產量:   " + lean1chat + "雙"; //+ "Lean2線產量:   " + row1["lean02"] + "雙" + "\n" + "Lean3線產量:   " + row1["lean03"] + "雙"+"\n";
                             go(message1);
                         }
                     }
@@ -96,7 +97,7 @@ namespace PROCAP_CLIENT
                                 row2[columnName] = columnValue;
                             }
                             sum = (int)row2["lean1線"];//+(int)row2["lean2線"]+(int)row2["lean3線"];
-                            message2 = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd")+"Lean" + "產量如下:" + "\n" + "Lean1線針車:      " + row2["lean1線"]+"雙" /*+ "\n" + "Lean2線針車:   " + row2["lean2線"]+ "\n" + "Lean3線針車:   " + row2["lean3線"]*/+"\n"+"   合計:         "+sum+"雙";
+                            message2 = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "Lean" + "產量如下:" + "\n" + "Lean1線針車:          " + row2["lean1線"] + "雙";/*+ "\n" + "Lean2線針車:   " + row2["lean2線"]+ "\n" + "Lean3線針車:   " + row2["lean3線"]*///+ "\n" + "   合計:                  " + sum + "雙";
                             go(message2);
                         }
 
@@ -129,8 +130,42 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader3[i];
                                 row3[columnName] = columnValue;
                             }
+
                             message3 = "Lean1線成型產量:    " + row3["lean01"] + "雙";//+ "\n" + "lean02:   " + row3["lean02"] + "\n" + "lean03:   " + row3["lean03"];
                             go(message3);
+                        }
+                    }
+                }
+            }
+        }
+        protected internal async Task gogo4()
+        {
+            string messagecomment;
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+            {
+                DateTime currentTime = DateTime.Now.Date;
+                conn.Open();
+                string sqlcomment = "select leancomment from cut where c_date=@currentTime";
+                using (NpgsqlCommand cmd = new NpgsqlCommand(sqlcomment, conn))
+                {
+                    cmd.Parameters.AddWithValue("@currentTime", currentTime);
+                    using (NpgsqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                string columnName = reader.GetName(i);
+                                object columnValue = reader[i];
+                                row[columnName] = columnValue;
+                            }
+                            if (row["leancomment"] is string stringValue)
+                                messagecomment = stringValue;
+                            else
+                                messagecomment = "Lean今日無補充說明";
+                            go(messagecomment);
                         }
                     }
                 }
@@ -803,7 +838,97 @@ namespace PROCAP_CLIENT
         {
             gogo2();
             gogo3();
+            gogo4();
             MessageBox.Show("lean線今日產量發送成功！");
+        }
+
+        private void buttoncomment_Click(object sender, EventArgs e)
+        {
+            Formchat formchat = new Formchat();
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    {
+                        string checkExistingdate = "SELECT COUNT(*) FROM cut WHERE c_date = @currentTime";
+                        using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                        {
+                            checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
+                            int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                            if (count > 0)
+                            {
+                                string checkExistingcomment = "SELECT leancomment FROM cut WHERE c_date=@currentTime ";
+                                using (NpgsqlCommand checkCommandcomment = new NpgsqlCommand(checkExistingcomment, conn))
+                                {
+                                    checkCommandcomment.Parameters.AddWithValue("@currentTime", currentTime);
+                                    object result = checkCommandcomment.ExecuteScalar();
+                                    if ((count > 0) && (result != null && result != DBNull.Value))
+                                    {
+                                        string updateSql = "UPDATE cut SET leancomment = @leancomment WHERE c_date = @currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@leancomment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("今日補充說明已更新");
+                                        formchat.DataGridViewChat();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                    else
+                                    {
+                                        string updateSql = "UPDATE cut SET leancomment = @leancomment WHERE c_date=@currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@leancomment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("補充說明提交成功");
+                                        formchat.DataGridViewChat();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string insertSql = "INSERT INTO cut (c_date, leancomment) VALUES (@currentTime, @leancomment)";
+                                using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                    insertCommand.Parameters.AddWithValue("@leancomment", textBoxcomment.Text.Trim());
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("補充說明提交成功");
+                                formchat.DataGridViewChat();
+                                conn.Close();
+                                textBoxcomment.Text = "";
+                                textBoxcomment.Focus();
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+                textBoxcomment.Text = "";
+            }
+        }
+
+        private void textBoxcomment_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                buttoncomment_Click(sender, e);
         }
     }
 }

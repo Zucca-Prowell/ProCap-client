@@ -49,6 +49,9 @@
             label7 = new Label();
             buttonclear = new Button();
             buttonmessage = new Button();
+            textBoxcomment = new TextBox();
+            buttoncomment = new Button();
+            label8 = new Label();
             SuspendLayout();
             // 
             // buttonsubmit
@@ -226,11 +229,42 @@
             buttonmessage.UseVisualStyleBackColor = true;
             buttonmessage.Click += buttonmessage_Click;
             // 
+            // textBoxcomment
+            // 
+            textBoxcomment.Location = new Point(213, 122);
+            textBoxcomment.Multiline = true;
+            textBoxcomment.Name = "textBoxcomment";
+            textBoxcomment.Size = new Size(100, 163);
+            textBoxcomment.TabIndex = 20;
+            textBoxcomment.KeyDown += textBoxcomment_KeyDown;
+            // 
+            // buttoncomment
+            // 
+            buttoncomment.Location = new Point(228, 299);
+            buttoncomment.Name = "buttoncomment";
+            buttoncomment.Size = new Size(75, 23);
+            buttoncomment.TabIndex = 21;
+            buttoncomment.Text = "提交";
+            buttoncomment.UseVisualStyleBackColor = true;
+            buttoncomment.Click += buttoncomment_Click;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(228, 101);
+            label8.Name = "label8";
+            label8.Size = new Size(62, 15);
+            label8.TabIndex = 22;
+            label8.Text = "補充說明:";
+            // 
             // Formlean
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(232, 361);
+            ClientSize = new Size(334, 361);
+            Controls.Add(label8);
+            Controls.Add(buttoncomment);
+            Controls.Add(textBoxcomment);
             Controls.Add(buttonmessage);
             Controls.Add(buttonclear);
             Controls.Add(label7);
@@ -280,5 +314,8 @@
         protected internal TextBox textBoxchat;
         private Button buttonclear;
         private Button buttonmessage;
+        private TextBox textBoxcomment;
+        private Button buttoncomment;
+        private Label label8;
     }
 }

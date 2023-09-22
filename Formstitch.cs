@@ -26,15 +26,16 @@ namespace PROCAP_CLIENT
         }
         private async Task gogo()
         {
-            int temp;
+            
             string message;
+            string message1;
             int sum = 0;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 DateTime currentTime = DateTime.Now.Date;
                 conn.Open();
-                string assemblemessage = "select stitch1,stitch2,stitch3,stitch4,stitch5 from stitch where c_date=@currentTime";
+                string assemblemessage = "select stitch1,stitch2,stitch3,stitch4,stitch5,comment from stitch where c_date=@currentTime";
                 using (NpgsqlCommand cmd = new NpgsqlCommand(assemblemessage, conn))
                 {
                     cmd.Parameters.AddWithValue("@currentTime", currentTime);
@@ -54,8 +55,12 @@ namespace PROCAP_CLIENT
                             int num3 = (int)row["stitch3"];
                             int num4 = (int)row["stitch4"];
                             int num5 = (int)row["stitch5"];
-                            sum = num1+ num2+ num3+ num4+ num5;
-                            message ="大家好！"+ DateTime.Now.ToString("yyyy-MM-dd") + "針車產量如下:" + "\n" + "針一課:   " + row["stitch1"]+"雙" + "\n" + "針二課:   " + row["stitch2"] + "雙" + "\n" + "針三課:   " + row["stitch3"] + "雙" + "\n" + "針四課:   " + row["stitch4"] + "雙" + "\n" + "針五課:   " + row["stitch5"] + "雙" + "\n"+" 合計:     "+sum+"雙";
+                            sum = num1 + num2 + num3 + num4 + num5;
+                            if (row["comment"] is string stringValue)
+                                message1 = stringValue;
+                            else
+                                message1 = "針車今日無補充說明";
+                            message = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "針車產量如下:" + "\n" + "針一課:   " + row["stitch1"] + "雙" + "\n" + "針二課:   " + row["stitch2"] + "雙" + "\n" + "針三課:   " + row["stitch3"] + "雙" + "\n" + "針四課:   " + row["stitch4"] + "雙" + "\n" + "針五課:   " + row["stitch5"] + "雙" + "\n" + " 合計:     " + sum + "雙"+"\n"+message1;
                             go(message);
                         }
                     }
@@ -70,7 +75,7 @@ namespace PROCAP_CLIENT
                 using (NpgsqlConnection conn = new NpgsqlConnection(connString))
                 {
                     conn.Open();
-                    string sqlstitch = "select c_date,stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,lean2線,lean3線 from stitch";
+                    string sqlstitch = "select c_date,stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,lean2線,lean3線,comment from stitch";
                     NpgsqlCommand cmd = new NpgsqlCommand(sqlstitch, conn);
                     NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
                     DataTable dataTable_St = new DataTable();
@@ -423,7 +428,7 @@ namespace PROCAP_CLIENT
                                     textBox1.Focus();
                                 }
                                 else
-                                {      
+                                {
                                     string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
                                     using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
                                     {
@@ -513,6 +518,95 @@ namespace PROCAP_CLIENT
         {
             gogo();
             MessageBox.Show("針車今日產量發送成功！");
+        }
+
+        private void buttoncomment_Click(object sender, EventArgs e)
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    {
+                        string checkExistingdate = "SELECT COUNT(*) FROM stitch WHERE c_date = @currentTime";
+                        using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                        {
+                            checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
+                            int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                            if (count > 0)
+                            {
+                                string checkExistingcomment = "SELECT comment FROM stitch WHERE c_date=@currentTime ";
+                                using (NpgsqlCommand checkCommandcomment = new NpgsqlCommand(checkExistingcomment, conn))
+                                {
+                                    checkCommandcomment.Parameters.AddWithValue("@currentTime", currentTime);
+                                    object result = checkCommandcomment.ExecuteScalar();
+                                    if ((count > 0) && (result != null && result != DBNull.Value))
+                                    {
+                                        string updateSql = "UPDATE stitch SET comment = @comment WHERE c_date = @currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("今日補充說明已更新");
+                                        DataGridViewStitch();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                    else
+                                    {
+                                        string updateSql = "UPDATE stitch SET comment = @comment WHERE c_date=@currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("補充說明提交成功");
+                                        DataGridViewStitch();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string insertSql = "INSERT INTO stitch (c_date, comment) VALUES (@currentTime, @comment)";
+                                using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                    insertCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("補充說明提交成功");
+                                DataGridViewStitch();
+                                conn.Close();
+                                textBoxcomment.Text = "";
+                                textBoxcomment.Focus();
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+                textBox1.Text = "";
+            }
+        }
+
+        private void textBoxcomment_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                buttoncomment_Click(sender, e);
         }
     }
 }

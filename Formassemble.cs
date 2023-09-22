@@ -27,13 +27,14 @@ namespace PROCAP_CLIENT
         {
             int temp;
             string message;
+            string message1;
             int sum = 0;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 DateTime currentTime = DateTime.Now.Date;
                 conn.Open();
-                string assemblemessage = "select assemble01,assemble02,assemble03,assemble04,assemble07 from assemble where c_date=@currentTime";
+                string assemblemessage = "select assemble01,assemble02,assemble03,assemble04,assemble07,comment from assemble where c_date=@currentTime";
                 using (NpgsqlCommand cmd = new NpgsqlCommand(assemblemessage, conn))
                 {
                     cmd.Parameters.AddWithValue("@currentTime", currentTime);
@@ -48,8 +49,12 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader[i];
                                 row[columnName] = columnValue;
                             }
-                            sum = (int)row["assemble01"] +(int)row["assemble02"] + (int)row["assemble03"] + (int)row["assemble04"] + (int)row["assemble07"];
-                            message = "大家好！"+DateTime.Now.ToString("yyyy-MM-dd") + "成型課產量如下:" + "\n"+"成1組:   " +row["assemble01"]+"雙"+"\n"+ "成2組:   " + row["assemble02"] + "雙" + "\n" + "成3組:   " + row["assemble03"] + "雙" + "\n" + "成4組:   " + row["assemble04"] + "雙" + "\n" + "成7組:   " + row["assemble07"] + "雙"+"\n"+" 合計:    "+sum+"雙";
+                            if (row["comment"] is string stringValue)
+                                message1 = stringValue;
+                            else
+                                message1 = "成型今日無補充說明";
+                            sum = (int)row["assemble01"] + (int)row["assemble02"] + (int)row["assemble03"] + (int)row["assemble04"] + (int)row["assemble07"];
+                            message = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "成型課產量如下:" + "\n" + "成1組:   " + row["assemble01"] + "雙" + "\n" + "成2組:   " + row["assemble02"] + "雙" + "\n" + "成3組:   " + row["assemble03"] + "雙" + "\n" + "成4組:   " + row["assemble04"] + "雙" + "\n" + "成7組:   " + row["assemble07"] + "雙" + "\n" + " 合計:    " + sum + "雙"+"\n"+message1;
                             go(message);
                         }
                     }
@@ -466,7 +471,7 @@ namespace PROCAP_CLIENT
                 using (NpgsqlConnection conn = new NpgsqlConnection(connString))
                 {
                     conn.Open();
-                    string sqlassemble = "select c_date,assemble01,assemble02,assemble03,assemble04,assemble07,lean01,lean02,lean03 from assemble";
+                    string sqlassemble = "select c_date,assemble01,assemble02,assemble03,assemble04,assemble07,lean01,lean02,lean03,comment from assemble";
                     NpgsqlCommand cmd = new NpgsqlCommand(sqlassemble, conn);
                     NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
                     DataTable dataTable_A = new DataTable();
@@ -508,6 +513,95 @@ namespace PROCAP_CLIENT
         {
             gogo();
             MessageBox.Show("成型今日產量發送成功！");
+        }
+
+        private void buttoncomment_Click(object sender, EventArgs e)
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    {
+                        string checkExistingdate = "SELECT COUNT(*) FROM assemble WHERE c_date = @currentTime";
+                        using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                        {
+                            checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
+                            int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                            if (count > 0)
+                            {
+                                string checkExistingcomment = "SELECT comment FROM assemble WHERE c_date=@currentTime ";
+                                using (NpgsqlCommand checkCommandcomment = new NpgsqlCommand(checkExistingcomment, conn))
+                                {
+                                    checkCommandcomment.Parameters.AddWithValue("@currentTime", currentTime);
+                                    object result = checkCommandcomment.ExecuteScalar();
+                                    if ((count > 0) && (result != null && result != DBNull.Value))
+                                    {
+                                        string updateSql = "UPDATE assemble SET comment = @comment WHERE c_date = @currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("今日補充說明已更新");
+                                        DataGridViewAssemble();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                    else
+                                    {
+                                        string updateSql = "UPDATE assemble SET comment = @comment WHERE c_date=@currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("補充說明提交成功");
+                                        DataGridViewAssemble();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string insertSql = "INSERT INTO assemble (c_date, comment) VALUES (@currentTime, @comment)";
+                                using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                    insertCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("補充說明提交成功");
+                                DataGridViewAssemble();
+                                conn.Close();
+                                textBoxcomment.Text = "";
+                                textBoxcomment.Focus();
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+                textBox1.Text = "";
+            }
+        }
+
+        private void textBoxcomment_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                buttoncomment_Click(sender, e);
         }
     }
 }

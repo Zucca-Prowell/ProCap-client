@@ -5,10 +5,12 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.PortableExecutable;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -32,7 +34,7 @@ namespace PROCAP_CLIENT
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            label1.Text = DateTime.Now.ToString("yyyy-MM-dd" + "產量");
+            label1.Text = DateTime.Now.ToString("yyyy-MM-dd" + "產量:");
         }
 
         private void Formchat_Load(object sender, EventArgs e)
@@ -40,7 +42,7 @@ namespace PROCAP_CLIENT
             timer1.Start();
             DataGridViewChat();
         }
-        private void DataGridViewChat()
+        protected internal void DataGridViewChat()
         {
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             try
@@ -48,7 +50,7 @@ namespace PROCAP_CLIENT
                 using (NpgsqlConnection conn = new NpgsqlConnection(connString))
                 {
                     conn.Open();
-                    string sqlchat = "select c_date,capacity,lean01,lean02,lean03 from cut";
+                    string sqlchat = "select c_date,capacity,lean01,lean02,lean03,comment,leancomment from cut";
                     NpgsqlCommand cmd = new NpgsqlCommand(sqlchat, conn);
                     NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
                     DataTable dataTable_C = new DataTable();
@@ -70,10 +72,11 @@ namespace PROCAP_CLIENT
 
         private void buttonsubmit_Click(object sender, EventArgs e)
         {
-           
+
             if (string.IsNullOrEmpty(textBox1.Text.Trim()))
             {
                 MessageBox.Show("產量不能為空");
+                textBox1.Focus();
             }
             else
             {
@@ -86,75 +89,67 @@ namespace PROCAP_CLIENT
                         conn.Open();
                         DateTime currentTime = DateTime.Now.Date;
                         {
-                            if (string.IsNullOrEmpty(textBox1.Text.Trim()))
+                            string checkExistingdate = "SELECT COUNT(*) FROM cut WHERE c_date = @currentTime";
+                            using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
                             {
-                                MessageBox.Show("產量不能為空");
-                                textBox1.Focus();
-                            }
-                            else
-                            {
-                                string checkExistingdate = "SELECT COUNT(*) FROM cut WHERE c_date = @currentTime";
-                                using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                                checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
+                                int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                                if (count > 0)
                                 {
-                                    checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
-                                    int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
-                                    if (count > 0)
+                                    string checkExistingdata = "SELECT capacity FROM cut WHERE c_date=@currentTime ";
+                                    using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
                                     {
-                                        string checkExistingdata = "SELECT capacity FROM cut WHERE c_date=@currentTime ";
-                                        using (NpgsqlCommand checkCommanddata = new NpgsqlCommand(checkExistingdata, conn))
+                                        checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
+                                        object result = checkCommanddata.ExecuteScalar();
+                                        if ((count > 0) && (result != null && result != DBNull.Value))
                                         {
-                                            checkCommanddata.Parameters.AddWithValue("@currentTime", currentTime);
-                                            object result = checkCommanddata.ExecuteScalar();
-                                            if ((count > 0) && (result != null && result != DBNull.Value))
+                                            string updateSql = "UPDATE cut SET capacity = @capacity WHERE c_date = @currentTime";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
                                             {
-                                                string updateSql = "UPDATE cut SET capacity = @capacity WHERE c_date = @currentTime";
-                                                using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
-                                                {
-                                                    updateCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
-                                                    updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
-                                                    updateCommand.ExecuteNonQuery();
-                                                }
-                                                MessageBox.Show("今日數據已更新");
-                                                DataGridViewChat();
-                                                conn.Close();
-                                                textBox1.Text = "";
-                                                textBox1.Focus();
+                                                updateCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
+                                                updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                updateCommand.ExecuteNonQuery();
                                             }
-                                            else
-                                            {
-                                                string updateSql = "UPDATE cut SET capacity = @capacity WHERE c_date=@currentTime";
-                                                using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
-                                                {
-                                                    updateCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
-                                                    updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
-                                                    updateCommand.ExecuteNonQuery();
-                                                }
-                                                MessageBox.Show("數據提交成功");
-                                                DataGridViewChat();
-                                                conn.Close();
-                                                textBox1.Text = "";
-                                                textBox1.Focus();
-                                            }
+                                            MessageBox.Show("今日數據已更新");
+                                            DataGridViewChat();
+                                            conn.Close();
+                                            textBox1.Text = "";
+                                            textBox1.Focus();
                                         }
-                                    }
-
-                                    else
-                                    {
-                                        string insertSql = "INSERT INTO cut (c_date, capacity) VALUES (@currentTime, @capacity)";
-                                        using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                        else
                                         {
-                                            insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
-                                            insertCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
-                                            insertCommand.ExecuteNonQuery();
+                                            string updateSql = "UPDATE cut SET capacity = @capacity WHERE c_date=@currentTime";
+                                            using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                            {
+                                                updateCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
+                                                updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                                updateCommand.ExecuteNonQuery();
+                                            }
+                                            MessageBox.Show("數據提交成功");
+                                            DataGridViewChat();
+                                            conn.Close();
+                                            textBox1.Text = "";
+                                            textBox1.Focus();
                                         }
-                                        MessageBox.Show("數據提交成功");
-                                        DataGridViewChat();
-                                        conn.Close();
-                                        textBox1.Text = "";
-                                        textBox1.Focus();
                                     }
                                 }
+                                else
+                                {
+                                    string insertSql = "INSERT INTO cut (c_date, capacity) VALUES (@currentTime, @capacity)";
+                                    using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                        insertCommand.Parameters.AddWithValue("@capacity", int.Parse(textBox1.Text.Trim()));
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                    MessageBox.Show("數據提交成功");
+                                    DataGridViewChat();
+                                    conn.Close();
+                                    textBox1.Text = "";
+                                    textBox1.Focus();
+                                }
                             }
+
                         }
                     }
 
@@ -184,13 +179,14 @@ namespace PROCAP_CLIENT
         {
             string message;
             string message1;
+            string message2;
             int sum = 0;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             using (NpgsqlConnection conn = new NpgsqlConnection(connString))
             {
                 DateTime currentTime = DateTime.Now.Date;
                 conn.Open();
-                string chatmessage = "select capacity from cut where c_date=@currentTime";
+                string chatmessage = "select capacity,comment from cut where c_date=@currentTime";
                 using (NpgsqlCommand cmd = new NpgsqlCommand(chatmessage, conn))
                 {
                     cmd.Parameters.AddWithValue("@currentTime", currentTime);
@@ -205,7 +201,7 @@ namespace PROCAP_CLIENT
                                 object columnValue = reader[i];
                                 row[columnName] = columnValue;
                             }
-                            message = "大家好！"+DateTime.Now.ToString("yyyy-MM-dd")+"裁加配套產量如下:   "+  row["capacity"]+"雙";
+                            message = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "裁加配套產量如下:   " + row["capacity"] + "雙";
                             go(message);
                             Thread.Sleep(1000);
                             Formlean formlean = new Formlean();
@@ -213,21 +209,120 @@ namespace PROCAP_CLIENT
                             int num1 = Formlean.lean1chat;
                             //int num2 = Formlean.lean2chat;  //開線解除注釋
                             //int num3 = Formlean.lean3chat;  //開線解除注釋
-                            int num4 = (int)row["capacity"];
-                            sum=num1+/*num2+num3+*/num4;
+                            int num4;
+                            if (row["capacity"] is int intValue)
+                                num4= intValue;
+                            else
+                                num4= 0;
+                            sum = num1 +/*num2+num3+*/num4;
                             message1 = "      合計:   " + sum + "雙";
                             go(message1);
+                            if (row["comment"] is string stringValue)
+                                message2 = stringValue;
+                            else
+                                message2 = "裁加今日無補充說明";
+                            Thread.Sleep(1000);
+                            go(message2);
                         }
                     }
-                    
+
                 }
             }
         }
-
         private void buttonmessage_Click(object sender, EventArgs e)
         {
             gogo();
             MessageBox.Show("裁加今日產量發送成功！");
+        }
+
+        private void buttoncomment_Click(object sender, EventArgs e)
+        {
+
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    {
+                        string checkExistingdate = "SELECT COUNT(*) FROM cut WHERE c_date = @currentTime";
+                        using (NpgsqlCommand checkCommanddate = new NpgsqlCommand(checkExistingdate, conn))
+                        {
+                            checkCommanddate.Parameters.AddWithValue("@currentTime", currentTime);
+                            int count = Convert.ToInt32(checkCommanddate.ExecuteScalar());
+                            if (count > 0)
+                            {
+                                string checkExistingcomment = "SELECT comment FROM cut WHERE c_date=@currentTime ";
+                                using (NpgsqlCommand checkCommandcomment = new NpgsqlCommand(checkExistingcomment, conn))
+                                {
+                                    checkCommandcomment.Parameters.AddWithValue("@currentTime", currentTime);
+                                    object result = checkCommandcomment.ExecuteScalar();
+                                    if ((count > 0) && (result != null && result != DBNull.Value))
+                                    {
+                                        string updateSql = "UPDATE cut SET comment = @comment WHERE c_date = @currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("今日補充說明已更新");
+                                        DataGridViewChat();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                    else
+                                    {
+                                        string updateSql = "UPDATE cut SET comment = @comment WHERE c_date=@currentTime";
+                                        using (NpgsqlCommand updateCommand = new NpgsqlCommand(updateSql, conn))
+                                        {
+                                            updateCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                            updateCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                            updateCommand.ExecuteNonQuery();
+                                        }
+                                        MessageBox.Show("補充說明提交成功");
+                                        DataGridViewChat();
+                                        conn.Close();
+                                        textBoxcomment.Text = "";
+                                        textBoxcomment.Focus();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string insertSql = "INSERT INTO cut (c_date, comment) VALUES (@currentTime, @comment)";
+                                using (NpgsqlCommand insertCommand = new NpgsqlCommand(insertSql, conn))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@currentTime", currentTime);
+                                    insertCommand.Parameters.AddWithValue("@comment", textBoxcomment.Text.Trim());
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                                MessageBox.Show("補充說明提交成功");
+                                DataGridViewChat();
+                                conn.Close();
+                                textBoxcomment.Text = "";
+                                textBoxcomment.Focus();
+                            }
+                        }
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+                textBox1.Text = "";
+            }
+        }
+
+        private void textBoxcomment_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                buttoncomment_Click(sender,e);
         }
     }
 }

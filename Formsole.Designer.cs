@@ -36,12 +36,15 @@
             label1 = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
             buttonmessage = new Button();
+            textBoxcomment = new TextBox();
+            label2 = new Label();
+            buttoncomment = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
             // buttonsubmit
             // 
-            buttonsubmit.Location = new Point(415, 420);
+            buttonsubmit.Location = new Point(556, 154);
             buttonsubmit.Name = "buttonsubmit";
             buttonsubmit.Size = new Size(75, 23);
             buttonsubmit.TabIndex = 0;
@@ -51,7 +54,7 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(282, 420);
+            textBox1.Location = new Point(570, 125);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(121, 23);
             textBox1.TabIndex = 1;
@@ -62,7 +65,7 @@
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "組底1組", "組底2組", "組底3組", "組底4組", "組底5組", "組底6組" });
-            comboBox1.Location = new Point(282, 391);
+            comboBox1.Location = new Point(570, 96);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(121, 23);
             comboBox1.TabIndex = 2;
@@ -71,17 +74,17 @@
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(65, 50);
+            dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(550, 320);
+            dataGridView1.Size = new Size(550, 461);
             dataGridView1.TabIndex = 3;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(183, 428);
+            label1.Location = new Point(570, 78);
             label1.Name = "label1";
             label1.Size = new Size(37, 15);
             label1.TabIndex = 4;
@@ -93,7 +96,7 @@
             // 
             // buttonmessage
             // 
-            buttonmessage.Location = new Point(415, 391);
+            buttonmessage.Location = new Point(639, 154);
             buttonmessage.Name = "buttonmessage";
             buttonmessage.Size = new Size(75, 23);
             buttonmessage.TabIndex = 5;
@@ -101,11 +104,42 @@
             buttonmessage.UseVisualStyleBackColor = true;
             buttonmessage.Click += buttonmessage_Click;
             // 
+            // textBoxcomment
+            // 
+            textBoxcomment.Location = new Point(556, 229);
+            textBoxcomment.Multiline = true;
+            textBoxcomment.Name = "textBoxcomment";
+            textBoxcomment.Size = new Size(158, 153);
+            textBoxcomment.TabIndex = 6;
+            textBoxcomment.KeyDown += textBoxcomment_KeyDown;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(608, 211);
+            label2.Name = "label2";
+            label2.Size = new Size(62, 15);
+            label2.TabIndex = 7;
+            label2.Text = "補充說明:";
+            // 
+            // buttoncomment
+            // 
+            buttoncomment.Location = new Point(600, 390);
+            buttoncomment.Name = "buttoncomment";
+            buttoncomment.Size = new Size(75, 23);
+            buttoncomment.TabIndex = 8;
+            buttoncomment.Text = "提交";
+            buttoncomment.UseVisualStyleBackColor = true;
+            buttoncomment.Click += buttoncomment_Click;
+            // 
             // Formsole
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 461);
+            ClientSize = new Size(723, 461);
+            Controls.Add(buttoncomment);
+            Controls.Add(label2);
+            Controls.Add(textBoxcomment);
             Controls.Add(buttonmessage);
             Controls.Add(label1);
             Controls.Add(dataGridView1);
@@ -131,5 +165,8 @@
         private System.Windows.Forms.Timer timer1;
         protected internal TextBox textBox1;
         private Button buttonmessage;
+        private TextBox textBoxcomment;
+        private Label label2;
+        private Button buttoncomment;
     }
 }
