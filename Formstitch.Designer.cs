@@ -71,12 +71,14 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(0, -1);
+            dataGridView1.Dock = DockStyle.Left;
+            dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(550, 462);
+            dataGridView1.Size = new Size(550, 461);
             dataGridView1.TabIndex = 3;
             // 
             // comboBox1
@@ -146,11 +148,13 @@
             Controls.Add(textBox1);
             Controls.Add(label1);
             Controls.Add(buttonsubmit);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
             Name = "Formstitch";
             Text = "針車產量";
             Load += Formstitch_Load;
             KeyDown += Formstitch_KeyDown;
+            Resize += Formstitch_Resize;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

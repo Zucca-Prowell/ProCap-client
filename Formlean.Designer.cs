@@ -284,11 +284,14 @@
             Controls.Add(radioButtonlean2);
             Controls.Add(radioButtonlean1);
             Controls.Add(buttonsubmit);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
+            MaximizeBox = false;
             Name = "Formlean";
             Text = "Lean線產量";
             Load += Formlean_Load;
             KeyDown += Formlean_KeyDown;
+            Resize += Formlean_Resize;
             ResumeLayout(false);
             PerformLayout();
         }

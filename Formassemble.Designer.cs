@@ -44,7 +44,9 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Dock = DockStyle.Left;
             dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
@@ -84,7 +86,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(580, 88);
+            label1.Location = new Point(580, 86);
             label1.Name = "label1";
             label1.Size = new Size(42, 15);
             label1.TabIndex = 4;
@@ -146,11 +148,13 @@
             Controls.Add(comboBox1);
             Controls.Add(buttonsubmit);
             Controls.Add(dataGridView1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
             Name = "Formassemble";
             Text = "成型產量";
             Load += Formassemble_Load;
             KeyDown += Formassemble_KeyDown;
+            Resize += Formassemble_Resize;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

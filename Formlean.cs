@@ -26,6 +26,51 @@ namespace PROCAP_CLIENT
         {
             InitializeComponent();
         }
+        float X, Y;
+        private void setTag(Control cons)
+        {
+            foreach (Control con in cons.Controls)
+            {
+                con.Tag = con.Width + ":" + con.Height + ":" + con.Left + ":" + con.Top + ":" + con.Font.Size;
+                if (con.Controls.Count > 0)
+                    setTag(con);
+            }
+        }
+        private void setControls(float newx, float newy, Control cons)
+        {
+            foreach (Control con in cons.Controls)
+            {
+                float a;
+                string[] mytag = con.Tag.ToString().Split(new char[] { ':' });
+                a = Convert.ToSingle(mytag[0]) * newx;
+                con.Width = (int)(a);
+                a = Convert.ToSingle(mytag[1]) * newy;
+                con.Height = (int)(a);
+                a = Convert.ToSingle(mytag[2]) * newx;
+                con.Left = (int)(a);
+                a = Convert.ToSingle(mytag[3]) * newy;
+                con.Top = (int)(a);
+                if (newx == 1)
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newy);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                if (newy == 1)
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newx);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                else
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newx * newy);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                if (con.Controls.Count > 0)
+                {
+                    setControls(newx, newy, con);
+                }
+            }
+        }
         protected internal async Task go(string message)
         {
             Prowell_slack_bot.slack.slack_init();
@@ -175,6 +220,10 @@ namespace PROCAP_CLIENT
         {
 
             timer1.Start();
+            this.Resize += new EventHandler(Formlean_Resize);
+            X = this.Width;
+            Y = this.Height;
+            setTag(this);
         }
 
         private void initializedata()
@@ -929,6 +978,13 @@ namespace PROCAP_CLIENT
         {
             if (e.KeyCode == Keys.Enter)
                 buttoncomment_Click(sender, e);
+        }
+
+        private void Formlean_Resize(object sender, EventArgs e)
+        {
+            float newx = (this.Width) / X;
+            float newy = this.Height / Y;
+            setControls(newx, newy, this);
         }
     }
 }

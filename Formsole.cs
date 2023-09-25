@@ -19,6 +19,52 @@ namespace PROCAP_CLIENT
         {
             InitializeComponent();
         }
+        float X, Y;
+        private void setTag(Control cons)
+        {
+            foreach (Control con in cons.Controls)
+            {
+                con.Tag = con.Width + ":" + con.Height + ":" + con.Left + ":" + con.Top + ":" + con.Font.Size;
+                if (con.Controls.Count > 0)
+                    setTag(con);
+            }
+        }
+        private void setControls(float newx, float newy, Control cons)
+        {
+            foreach (Control con in cons.Controls)
+            {
+                float a;
+                string[] mytag = con.Tag.ToString().Split(new char[] { ':' });
+                a = Convert.ToSingle(mytag[0]) * newx;
+                con.Width = (int)(a);
+                a = Convert.ToSingle(mytag[1]) * newy;
+                con.Height = (int)(a);
+                a = Convert.ToSingle(mytag[2]) * newx;
+                con.Left = (int)(a);
+                a = Convert.ToSingle(mytag[3]) * newy;
+                con.Top = (int)(a);
+                if (newx == 1)
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newy);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                if (newy == 1)
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newx);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                else
+                {
+                    Single currentSize = Convert.ToSingle(mytag[4]) * (float)Math.Sqrt(newx * newy);
+                    con.Font = new Font(con.Font.Name, currentSize, con.Font.Style, con.Font.Unit);
+                }
+                if (con.Controls.Count > 0)
+                {
+                    setControls(newx, newy, con);
+                }
+            }
+        }
+
         private async Task go(string message)
         {
             Prowell_slack_bot.slack.slack_init();
@@ -55,7 +101,7 @@ namespace PROCAP_CLIENT
                             else
                                 message1 = "組底今日無補充說明";
                             sum = (int)row["sole1"] + (int)row["sole2"] + (int)row["sole3"] + (int)row["sole4"] + (int)row["sole5"] + (int)row["sole6"];
-                            message = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "組底產量如下:" + "\n" + "流水線1組:   " + row["sole1"] + "雙" + "\n" + "流水線2組:   " + row["sole2"] + "雙" + "\n" + "流水線3組:   " + row["sole3"] + "雙" + "\n" + "流水線4組:   " + row["sole4"] + "雙" + "\n" + "流水線5組:   " + row["sole5"] + "雙" + "\n" + "流水線6組:   " + row["sole6"] + "雙" + "\n" + "\t" + "合計:       " + sum + "雙"+"\n"+message1;
+                            message = "大家好！" + DateTime.Now.ToString("yyyy-MM-dd") + "組底產量如下:" + "\n" + "流水線1組:   " + row["sole1"] + "雙" + "\n" + "流水線2組:   " + row["sole2"] + "雙" + "\n" + "流水線3組:   " + row["sole3"] + "雙" + "\n" + "流水線4組:   " + row["sole4"] + "雙" + "\n" + "流水線5組:   " + row["sole5"] + "雙" + "\n" + "流水線6組:   " + row["sole6"] + "雙" + "\n" + "\t" + "合計:       " + sum + "雙" + "\n" + message1;
                             go(message);
                         }
                     }
@@ -540,22 +586,94 @@ namespace PROCAP_CLIENT
             timer1.Start();
             comboBox1.SelectedIndex = 0;
             DataGridViewSole();
+            this.Resize += new EventHandler(Formsole_Resize);
+            X = this.Width;
+            Y = this.Height;
+            setTag(this);
         }
         private void DataGridViewSole()
         {
+            int temp;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
             try
             {
                 using (NpgsqlConnection conn = new NpgsqlConnection(connString))
                 {
                     conn.Open();
-                    string sqlsole = "select c_date,sole1,sole2,sole3,sole4,sole5,sole6,comment from sole";
-                    NpgsqlCommand cmd = new NpgsqlCommand(sqlsole, conn);
-                    NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
-                    DataTable dataTable_So = new DataTable();
-                    adp.Fill(dataTable_So);
-                    dataGridView1.DataSource = dataTable_So;
-
+                    DateTime currentTime = DateTime.Now.Date;
+                    string sqlsole = "select c_date,solesum,sole1,sole2,sole3,sole4,sole5,sole6,comment from sole";
+                    string sqlsolesum1 = "select sole1,sole2,sole3,sole4,sole5,sole6,solesum from sole where c_date=@currentTime";
+                    string sqlsolesum2 = "update sole set solesum=@solesum where c_date=@currentTime";
+                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlsole, conn))
+                    {
+                        using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlsolesum2, conn))
+                        {
+                            using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlsolesum1, conn))
+                            {
+                                cmd1.Parameters.AddWithValue("@currentTime", currentTime);
+                                using (NpgsqlDataReader reader = cmd1.ExecuteReader())
+                                {
+                                    reader.Read();
+                                    {
+                                        int value1;
+                                        int value2;
+                                        int value3;
+                                        int value4;
+                                        int value5;
+                                        int value6;
+                                        int value7;
+                                        if (reader["sole1"] is int intValue1)
+                                            value1 = intValue1;
+                                        else
+                                            value1 = 0;
+                                        if (reader["sole2"] is int intValue2)
+                                            value2 = intValue2;
+                                        else
+                                            value2 = 0;
+                                        if (reader["sole3"] is int intValue3)
+                                            value3 = intValue3;
+                                        else
+                                            value3 = 0;
+                                        if (reader["sole4"] is int intValue4)
+                                            value4 = intValue4;
+                                        else
+                                            value4 = 0;
+                                        if (reader["sole5"] is int intValue5)
+                                            value5 = intValue5;
+                                        else
+                                            value5 = 0;
+                                        if (reader["sole6"] is int intValue6)
+                                            value6 = intValue6;
+                                        else
+                                            value6 = 0;
+                                        if (reader["solesum"] is int intValue7)
+                                            value7 = intValue7;
+                                        else
+                                            value7 = 0;
+                                        value7 = value1 + value2 + value3 + value4 + value5 + value6;
+                                        temp = value7;
+                                    }
+                                }
+                            }
+                            cmd2.Parameters.AddWithValue("@solesum", temp);
+                            cmd2.Parameters.AddWithValue("@currentTime", currentTime);
+                            cmd2.ExecuteNonQuery();
+                        }
+                          NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd3);
+                        DataTable dataTable_So = new DataTable();
+                        adp.Fill(dataTable_So);
+                        dataGridView1.DataSource = dataTable_So;
+                        dataGridView1.Sort(dataGridView1.Columns["c_date"], ListSortDirection.Descending);
+                        dataGridView1.Columns["c_date"].HeaderText = "日期";
+                        dataGridView1.Columns["comment"].HeaderText = "補充說明";
+                        dataGridView1.Columns["sole1"].HeaderText = "流水線1";
+                        dataGridView1.Columns["sole2"].HeaderText = "流水線2";
+                        dataGridView1.Columns["sole3"].HeaderText = "流水線3";
+                        dataGridView1.Columns["sole4"].HeaderText = "流水線4";
+                        dataGridView1.Columns["sole5"].HeaderText = "流水線5";
+                        dataGridView1.Columns["sole6"].HeaderText = "流水線6";
+                        dataGridView1.Columns["solesum"].HeaderText = "組底合計";
+                    }
                 }
             }
             catch (Exception ex)
@@ -678,6 +796,13 @@ namespace PROCAP_CLIENT
         {
             if (e.KeyCode == Keys.Enter)
                 buttoncomment_Click(sender, e);
+        }
+
+        private void Formsole_Resize(object sender, EventArgs e)
+        {
+            float newx = (this.Width) / X;
+            float newy = this.Height / Y;
+            setControls(newx, newy, this);
         }
     }
 }

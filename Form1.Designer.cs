@@ -60,7 +60,7 @@
             // 
             comboBoxdp.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxdp.FormattingEnabled = true;
-            comboBoxdp.Items.AddRange(new object[] { "裁加", "針車", "組底", "成型", "lean線" });
+            comboBoxdp.Items.AddRange(new object[] { "裁加", "針車", "組底", "成型", "lean線", "成品倉" });
             comboBoxdp.Location = new Point(550, 141);
             comboBoxdp.Name = "comboBoxdp";
             comboBoxdp.Size = new Size(121, 23);
@@ -76,12 +76,14 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(12, 12);
+            dataGridView1.Dock = DockStyle.Left;
+            dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(511, 405);
+            dataGridView1.Size = new Size(523, 450);
             dataGridView1.TabIndex = 5;
             // 
             // Formmain
@@ -94,9 +96,11 @@
             Controls.Add(comboBoxdp);
             Controls.Add(buttonsearch);
             Controls.Add(buttonadd);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "Formmain";
             Text = "產量登記";
             Load += Formmain_Load;
+            Resize += Formmain_Resize;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

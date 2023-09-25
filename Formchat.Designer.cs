@@ -43,12 +43,15 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(-1, -2);
+            dataGridView1.Dock = DockStyle.Left;
+            dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
+            dataGridView1.RowHeadersWidth = 30;
             dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(519, 463);
+            dataGridView1.Size = new Size(519, 461);
             dataGridView1.TabIndex = 0;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
@@ -135,11 +138,13 @@
             Controls.Add(label1);
             Controls.Add(buttonsubmit);
             Controls.Add(dataGridView1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
             Name = "Formchat";
             Text = "裁加產量";
             Load += Formchat_Load;
             KeyDown += Formchat_KeyDown;
+            Resize += Formchat_Resize;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
             PerformLayout();

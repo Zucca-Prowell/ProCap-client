@@ -39,3 +39,4 @@ D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.EntityFramewo
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Npgsql.Json.NET.dll
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\SlackAPI.dll
 D:\ie10\Desktop\code\ProCap-client\bin\Debug\net6.0-windows\Prowell_slack_bot.pdb
+D:\ie10\Desktop\code\ProCap-client\obj\Debug\net6.0-windows\PROCAP_CLIENT.Formproduction.resources
