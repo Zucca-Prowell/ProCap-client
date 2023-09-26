@@ -33,12 +33,10 @@
             radioButtonlean1 = new RadioButton();
             radioButtonlean2 = new RadioButton();
             radioButtonlean3 = new RadioButton();
-            textBoxchat = new TextBox();
             timer1 = new System.Windows.Forms.Timer(components);
             label1 = new Label();
             textBoxstitch1 = new TextBox();
             textBoxassemble = new TextBox();
-            label2 = new Label();
             label3 = new Label();
             label4 = new Label();
             textBoxstitch2 = new TextBox();
@@ -56,7 +54,7 @@
             // 
             // buttonsubmit
             // 
-            buttonsubmit.Location = new Point(112, 299);
+            buttonsubmit.Location = new Point(123, 299);
             buttonsubmit.Name = "buttonsubmit";
             buttonsubmit.Size = new Size(75, 23);
             buttonsubmit.TabIndex = 9;
@@ -94,14 +92,6 @@
             radioButtonlean3.Text = "Lean3線";
             radioButtonlean3.UseVisualStyleBackColor = true;
             // 
-            // textBoxchat
-            // 
-            textBoxchat.Location = new Point(87, 122);
-            textBoxchat.Name = "textBoxchat";
-            textBoxchat.Size = new Size(100, 23);
-            textBoxchat.TabIndex = 3;
-            textBoxchat.KeyDown += textBoxchat_KeyDown;
-            // 
             // timer1
             // 
             timer1.Tick += timer1_Tick;
@@ -117,7 +107,7 @@
             // 
             // textBoxstitch1
             // 
-            textBoxstitch1.Location = new Point(87, 151);
+            textBoxstitch1.Location = new Point(87, 122);
             textBoxstitch1.Name = "textBoxstitch1";
             textBoxstitch1.Size = new Size(100, 23);
             textBoxstitch1.TabIndex = 4;
@@ -125,25 +115,16 @@
             // 
             // textBoxassemble
             // 
-            textBoxassemble.Location = new Point(87, 270);
+            textBoxassemble.Location = new Point(87, 241);
             textBoxassemble.Name = "textBoxassemble";
             textBoxassemble.Size = new Size(100, 23);
             textBoxassemble.TabIndex = 8;
             textBoxassemble.KeyDown += textBoxassemble_KeyDown;
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(48, 125);
-            label2.Name = "label2";
-            label2.Size = new Size(33, 15);
-            label2.TabIndex = 16;
-            label2.Text = "裁加";
-            // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(42, 154);
+            label3.Location = new Point(42, 125);
             label3.Name = "label3";
             label3.Size = new Size(39, 15);
             label3.TabIndex = 15;
@@ -152,7 +133,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(48, 270);
+            label4.Location = new Point(48, 244);
             label4.Name = "label4";
             label4.Size = new Size(33, 15);
             label4.TabIndex = 11;
@@ -160,7 +141,7 @@
             // 
             // textBoxstitch2
             // 
-            textBoxstitch2.Location = new Point(87, 180);
+            textBoxstitch2.Location = new Point(87, 151);
             textBoxstitch2.Name = "textBoxstitch2";
             textBoxstitch2.Size = new Size(100, 23);
             textBoxstitch2.TabIndex = 5;
@@ -168,7 +149,7 @@
             // 
             // textBoxstitch3
             // 
-            textBoxstitch3.Location = new Point(87, 212);
+            textBoxstitch3.Location = new Point(87, 180);
             textBoxstitch3.Name = "textBoxstitch3";
             textBoxstitch3.Size = new Size(100, 23);
             textBoxstitch3.TabIndex = 6;
@@ -176,7 +157,7 @@
             // 
             // textBoxstitch4
             // 
-            textBoxstitch4.Location = new Point(87, 241);
+            textBoxstitch4.Location = new Point(87, 209);
             textBoxstitch4.Name = "textBoxstitch4";
             textBoxstitch4.Size = new Size(100, 23);
             textBoxstitch4.TabIndex = 7;
@@ -185,7 +166,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(42, 183);
+            label5.Location = new Point(42, 154);
             label5.Name = "label5";
             label5.Size = new Size(39, 15);
             label5.TabIndex = 14;
@@ -194,7 +175,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(42, 215);
+            label6.Location = new Point(42, 183);
             label6.Name = "label6";
             label6.Size = new Size(39, 15);
             label6.TabIndex = 13;
@@ -203,7 +184,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(42, 244);
+            label7.Location = new Point(42, 212);
             label7.Name = "label7";
             label7.Size = new Size(39, 15);
             label7.TabIndex = 12;
@@ -211,7 +192,7 @@
             // 
             // buttonclear
             // 
-            buttonclear.Location = new Point(28, 299);
+            buttonclear.Location = new Point(42, 299);
             buttonclear.Name = "buttonclear";
             buttonclear.Size = new Size(75, 23);
             buttonclear.TabIndex = 10;
@@ -221,7 +202,7 @@
             // 
             // buttonmessage
             // 
-            buttonmessage.Location = new Point(69, 328);
+            buttonmessage.Location = new Point(77, 328);
             buttonmessage.Name = "buttonmessage";
             buttonmessage.Size = new Size(75, 23);
             buttonmessage.TabIndex = 19;
@@ -275,11 +256,9 @@
             Controls.Add(textBoxstitch2);
             Controls.Add(label4);
             Controls.Add(label3);
-            Controls.Add(label2);
             Controls.Add(textBoxassemble);
             Controls.Add(textBoxstitch1);
             Controls.Add(label1);
-            Controls.Add(textBoxchat);
             Controls.Add(radioButtonlean3);
             Controls.Add(radioButtonlean2);
             Controls.Add(radioButtonlean1);
@@ -303,9 +282,7 @@
         private RadioButton radioButtonlean3;
         private System.Windows.Forms.Timer timer1;
         private Label label1;
-        private TextBox textBoxstitch1;
         private TextBox textBoxassemble;
-        private Label label2;
         private Label label3;
         private Label label4;
         private TextBox textBoxstitch2;
@@ -314,11 +291,11 @@
         private Label label5;
         private Label label6;
         private Label label7;
-        protected internal TextBox textBoxchat;
         private Button buttonclear;
         private Button buttonmessage;
         private TextBox textBoxcomment;
         private Button buttoncomment;
         private Label label8;
+        protected internal TextBox textBoxstitch1;
     }
 }

@@ -153,6 +153,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -169,6 +170,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -188,6 +190,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            assemblesum();
                                             DataGridViewAssemble();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -229,6 +232,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -245,6 +249,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -264,6 +269,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            assemblesum();
                                             DataGridViewAssemble();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -305,6 +311,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -321,6 +328,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -340,6 +348,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            assemblesum();
                                             DataGridViewAssemble();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -381,6 +390,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -397,6 +407,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -416,6 +427,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            assemblesum();
                                             DataGridViewAssemble();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -457,6 +469,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -472,6 +485,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    assemblesum();
                                                     DataGridViewAssemble();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -490,6 +504,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            assemblesum();
                                             DataGridViewAssemble();
                                             conn.Close();
                                             textBox1.Text = "";
@@ -508,7 +523,7 @@ namespace PROCAP_CLIENT
                 textBox1.Text = "";
             }
         }
-        private void DataGridViewAssemble()
+        private void assemblesum()
         {
             int temp;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
@@ -518,59 +533,75 @@ namespace PROCAP_CLIENT
                 {
                     conn.Open();
                     DateTime currentTime = DateTime.Now.Date;
-                    string sqlassemble = "select c_date,assemblesum,assemble01,assemble02,assemble03,assemble04,assemble07,lean01,lean02,lean03,comment from assemble";
                     string sqlassemblesum2 = "update assemble set assemblesum=@assemblesum where c_date=@currentTime";
                     string sqlassemblesum1 = "select assemble01,assemble02,assemble03,assemble04,assemble07,assemblesum from assemble where c_date=@currentTime";
-                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlassemble, conn))
+                    using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlassemblesum2, conn))
                     {
-                        using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlassemblesum2, conn))
+                        using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlassemblesum1, conn))
                         {
-                            using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlassemblesum1, conn))
+                            cmd1.Parameters.AddWithValue("@currentTime", currentTime);
+                            using (NpgsqlDataReader reader = cmd1.ExecuteReader())
                             {
-                                cmd1.Parameters.AddWithValue("@currentTime", currentTime);
-                                using (NpgsqlDataReader reader = cmd1.ExecuteReader())
+                                reader.Read();
                                 {
-                                    reader.Read();
-                                    {
-                                        int value1;
-                                        int value2;
-                                        int value3;
-                                        int value4;
-                                        int value5;
-                                        int value6;
-                                        if (reader["assemble01"] is int intValue1)
-                                            value1 = intValue1;
-                                        else
-                                            value1 = 0;
-                                        if (reader["assemble02"] is int intValue2)
-                                            value2 = intValue2;
-                                        else
-                                            value2 = 0;
-                                        if (reader["assemble03"] is int intValue3)
-                                            value3 = intValue3;
-                                        else
-                                            value3 = 0;
-                                        if (reader["assemble04"] is int intValue4)
-                                            value4 = intValue4;
-                                        else
-                                            value4 = 0;
-                                        if (reader["assemble07"] is int intValue5)
-                                            value5 = intValue5;
-                                        else
-                                            value5 = 0;
-                                        if (reader["assemblesum"] is int intValue6)
-                                            value6 = intValue6;
-                                        else
-                                            value6 = 0;
-                                        value6 = value1 + value2 + value3 + value4 + value5;
-                                        temp = value6;
-                                    }
+                                    int value1;
+                                    int value2;
+                                    int value3;
+                                    int value4;
+                                    int value5;
+                                    int value6;
+                                    if (reader["assemble01"] is int intValue1)
+                                        value1 = intValue1;
+                                    else
+                                        value1 = 0;
+                                    if (reader["assemble02"] is int intValue2)
+                                        value2 = intValue2;
+                                    else
+                                        value2 = 0;
+                                    if (reader["assemble03"] is int intValue3)
+                                        value3 = intValue3;
+                                    else
+                                        value3 = 0;
+                                    if (reader["assemble04"] is int intValue4)
+                                        value4 = intValue4;
+                                    else
+                                        value4 = 0;
+                                    if (reader["assemble07"] is int intValue5)
+                                        value5 = intValue5;
+                                    else
+                                        value5 = 0;
+                                    if (reader["assemblesum"] is int intValue6)
+                                        value6 = intValue6;
+                                    else
+                                        value6 = 0;
+                                    value6 = value1 + value2 + value3 + value4 + value5;
+                                    temp = value6;
                                 }
                             }
-                            cmd2.Parameters.AddWithValue("@assemblesum", temp);
-                            cmd2.Parameters.AddWithValue("@currentTime", currentTime);
-                            cmd2.ExecuteNonQuery();
                         }
+                        cmd2.Parameters.AddWithValue("@assemblesum", temp);
+                        cmd2.Parameters.AddWithValue("@currentTime", currentTime);
+                        cmd2.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
+        private void DataGridViewAssemble()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    string sqlassemble = "select c_date,assemblesum,assemble01,assemble02,assemble03,assemble04,assemble07,lean01,lean02,lean03,comment from assemble";
+                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlassemble, conn))
+                    {
                         NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd3);
                         DataTable dataTable_A = new DataTable();
                         adp.Fill(dataTable_A);

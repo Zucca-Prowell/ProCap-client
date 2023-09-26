@@ -131,7 +131,7 @@ namespace PROCAP_CLIENT
                             var formlean = new Formlean();
                             formlean.FormClosed += (s, args) => isFormOpen = false;
                             formlean.Show();
-                            formlean.textBoxchat.Focus();
+                            formlean.textBoxstitch1.Focus();
                         }
                     }
                     break;

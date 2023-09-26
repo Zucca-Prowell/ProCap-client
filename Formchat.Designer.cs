@@ -38,6 +38,7 @@
             textBoxcomment = new TextBox();
             label2 = new Label();
             buttoncomment = new Button();
+            comboBox1 = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -69,7 +70,7 @@
             // 
             label1.AutoSize = true;
             label1.BackColor = SystemColors.ButtonFace;
-            label1.Location = new Point(549, 104);
+            label1.Location = new Point(552, 67);
             label1.Name = "label1";
             label1.Size = new Size(47, 15);
             label1.TabIndex = 3;
@@ -125,11 +126,22 @@
             buttoncomment.UseVisualStyleBackColor = true;
             buttoncomment.Click += buttoncomment_Click;
             // 
+            // comboBox1
+            // 
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "裁加(大線)", "裁准(lean1線)" });
+            comboBox1.Location = new Point(538, 93);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(123, 23);
+            comboBox1.TabIndex = 8;
+            // 
             // Formchat
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(684, 461);
+            Controls.Add(comboBox1);
             Controls.Add(buttoncomment);
             Controls.Add(label2);
             Controls.Add(textBoxcomment);
@@ -161,5 +173,6 @@
         private TextBox textBoxcomment;
         private Label label2;
         private Button buttoncomment;
+        private ComboBox comboBox1;
     }
 }

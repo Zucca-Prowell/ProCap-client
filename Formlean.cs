@@ -14,8 +14,8 @@ namespace PROCAP_CLIENT
         public static int lean1chat;
         public static int lean2chat;
         public static int lean3chat;
-        TextBox[] textcheck = new TextBox[6];
-        bool[] boolarray = new bool[9];
+        TextBox[] textcheck = new TextBox[5];
+        bool[] boolarray = new bool[8];
         bool judgement = false;
         int k = 0;
         bool flag = false;
@@ -218,7 +218,6 @@ namespace PROCAP_CLIENT
         }
         private void Formlean_Load(object sender, EventArgs e)
         {
-
             timer1.Start();
             this.Resize += new EventHandler(Formlean_Resize);
             X = this.Width;
@@ -228,12 +227,11 @@ namespace PROCAP_CLIENT
 
         private void initializedata()
         {
-            textcheck[0] = textBoxchat;
-            textcheck[1] = textBoxstitch1;
-            textcheck[2] = textBoxstitch2;
-            textcheck[3] = textBoxstitch3;
-            textcheck[4] = textBoxstitch4;
-            textcheck[5] = textBoxassemble;
+            textcheck[0] = textBoxstitch1;
+            textcheck[1] = textBoxstitch2;
+            textcheck[2] = textBoxstitch3;
+            textcheck[3] = textBoxstitch4;
+            textcheck[4] = textBoxassemble;
             boolarray[0] = radioButtonlean1.Checked;
             boolarray[1] = radioButtonlean2.Checked;
             boolarray[2] = radioButtonlean3.Checked;
@@ -242,7 +240,6 @@ namespace PROCAP_CLIENT
             boolarray[5] = string.IsNullOrEmpty(textcheck[2].Text.Trim());
             boolarray[6] = string.IsNullOrEmpty(textcheck[3].Text.Trim());
             boolarray[7] = string.IsNullOrEmpty(textcheck[4].Text.Trim());
-            boolarray[8] = string.IsNullOrEmpty(textcheck[5].Text.Trim());
         }
         private bool judgenull()
         {
@@ -305,8 +302,6 @@ namespace PROCAP_CLIENT
                         DateTime currentTime = DateTime.Now.Date;
                         if (radioButtonlean1.Checked)
                         {
-                            string checkExistingdate_C = "SELECT COUNT(*) FROM cut WHERE c_date=@c_date";
-                            string checkExistingdata_C = "SELECT lean01 FROM cut";
                             string checkExistingdate_S = "SELECT COUNT(*) FROM stitch WHERE c_date=@c_date";
                             string checkExistingdata_S = "SELECT lean1線 FROM stitch";
                             string checkExistingdate_A = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
@@ -315,19 +310,14 @@ namespace PROCAP_CLIENT
                             using (NpgsqlCommand checkCommanddata_A = new NpgsqlCommand(checkExistingdata_A, conn))
                             using (NpgsqlCommand checkCommanddate_S = new NpgsqlCommand(checkExistingdate_S, conn))
                             using (NpgsqlCommand checkCommanddata_S = new NpgsqlCommand(checkExistingdata_S, conn))
-                            using (NpgsqlCommand checkCommanddate_C = new NpgsqlCommand(checkExistingdate_C, conn))
-                            using (NpgsqlCommand checkCommanddata_C = new NpgsqlCommand(checkExistingdata_C, conn))
                             {
                                 checkCommanddate_A.Parameters.AddWithValue("c_date", currentTime);
                                 checkCommanddate_S.Parameters.AddWithValue("c_date", currentTime);
-                                checkCommanddate_C.Parameters.AddWithValue("c_date", currentTime);
                                 // 检查是否存在相同时间戳的记录
                                 int count_A = Convert.ToInt32(checkCommanddate_A.ExecuteScalar());
                                 int count_S = Convert.ToInt32(checkCommanddate_S.ExecuteScalar());
-                                int count_C = Convert.ToInt32(checkCommanddate_C.ExecuteScalar());
                                 object result_A = checkCommanddata_A.ExecuteScalar();
                                 object result_S = checkCommanddata_S.ExecuteScalar();
-                                object result_C = checkCommanddata_C.ExecuteScalar();
                                 if (count_A > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -354,28 +344,6 @@ namespace PROCAP_CLIENT
                                 }
                                 //-------------------------------------------------------------------
                                 // 检查是否存在相同时间戳的记录
-                                if (count_C > 0)
-                                {
-                                    string updateSql_C = "UPDATE cut SET lean01 = @lean01 WHERE c_date = @c_date";
-                                    using (NpgsqlCommand updateCommand_C = new NpgsqlCommand(updateSql_C, conn))
-                                    {
-                                        updateCommand_C.Parameters.AddWithValue("lean01", int.Parse(textBoxchat.Text.Trim()));
-                                        updateCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        updateCommand_C.ExecuteNonQuery();
-                                    }
-                                }
-                                else
-                                {
-                                    // 如果不存在相同时间戳的记录，执行插入操作
-                                    string insertSql_C = "INSERT INTO cut (c_date,lean01) VALUES (@c_date, @lean01)";
-                                    using (NpgsqlCommand insertCommand_C = new NpgsqlCommand(insertSql_C, conn))
-                                    {
-                                        insertCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        insertCommand_C.Parameters.AddWithValue("lean01", int.Parse(textBoxchat.Text.Trim()));
-                                        insertCommand_C.ExecuteNonQuery();
-                                    }
-
-                                }
                                 if (count_S > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -408,17 +376,12 @@ namespace PROCAP_CLIENT
                                 {
                                     a.Text = "";
                                 }
-                                textBoxchat.Focus();
+                                textBoxstitch1.Focus();
                             }
                         }
 
                         if (radioButtonlean2.Checked)
                         {
-                            //該lean線針車與大線針車合並
-                            //lean裁加與大線裁加合併
-                            //lean成型數據直接放進assemble表裡
-                            string checkExistingdate_C2 = "SELECT COUNT(*) FROM cut WHERE c_date=@c_date";
-                            string checkExistingdata_C2 = "SELECT lean02 FROM cut";
                             string checkExistingdate_S2 = "SELECT COUNT(*) FROM stitch WHERE c_date=@c_date";
                             string checkExistingdata_S2 = "SELECT lean2線 FROM stitch";
                             string checkExistingdate_A2 = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
@@ -427,19 +390,14 @@ namespace PROCAP_CLIENT
                             using (NpgsqlCommand checkCommanddata_A = new NpgsqlCommand(checkExistingdata_A2, conn))
                             using (NpgsqlCommand checkCommanddate_S = new NpgsqlCommand(checkExistingdate_S2, conn))
                             using (NpgsqlCommand checkCommanddata_S = new NpgsqlCommand(checkExistingdata_S2, conn))
-                            using (NpgsqlCommand checkCommanddate_C = new NpgsqlCommand(checkExistingdate_C2, conn))
-                            using (NpgsqlCommand checkCommanddata_C = new NpgsqlCommand(checkExistingdata_C2, conn))
                             {
                                 checkCommanddate_A.Parameters.AddWithValue("c_date", currentTime);
                                 checkCommanddate_S.Parameters.AddWithValue("c_date", currentTime);
-                                checkCommanddate_C.Parameters.AddWithValue("c_date", currentTime);
                                 // 检查是否存在相同时间戳的记录
                                 int count_A = Convert.ToInt32(checkCommanddate_A.ExecuteScalar());
                                 int count_S = Convert.ToInt32(checkCommanddate_S.ExecuteScalar());
-                                int count_C = Convert.ToInt32(checkCommanddate_C.ExecuteScalar());
                                 object result_A = checkCommanddata_A.ExecuteScalar();
                                 object result_S = checkCommanddata_S.ExecuteScalar();
-                                object result_C = checkCommanddata_C.ExecuteScalar();
                                 if (count_A > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -466,28 +424,6 @@ namespace PROCAP_CLIENT
                                 }
                                 //-------------------------------------------------------------------
                                 // 检查是否存在相同时间戳的记录
-                                if (count_C > 0)
-                                {
-                                    string updateSql_C = "UPDATE cut SET lean02 = @lean02 WHERE c_date = @c_date";
-                                    using (NpgsqlCommand updateCommand_C = new NpgsqlCommand(updateSql_C, conn))
-                                    {
-                                        updateCommand_C.Parameters.AddWithValue("lean02", int.Parse(textBoxchat.Text.Trim()));
-                                        updateCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        updateCommand_C.ExecuteNonQuery();
-                                    }
-                                }
-                                else
-                                {
-                                    // 如果不存在相同时间戳的记录，执行插入操作
-                                    string insertSql_C = "INSERT INTO cut (c_date,lean02) VALUES (@c_date, @lean02)";
-                                    using (NpgsqlCommand insertCommand_C = new NpgsqlCommand(insertSql_C, conn))
-                                    {
-                                        insertCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        insertCommand_C.Parameters.AddWithValue("lean02", int.Parse(textBoxchat.Text.Trim()));
-                                        insertCommand_C.ExecuteNonQuery();
-                                    }
-
-                                }
                                 if (count_S > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -520,16 +456,11 @@ namespace PROCAP_CLIENT
                                 {
                                     a.Text = "";
                                 }
-                                textBoxchat.Focus();
+                                textBoxstitch1.Focus();
                             }
                         }
                         if (radioButtonlean3.Checked)
                         {
-                            //該lean線針車與大線針車合並
-                            //lean裁加與大線裁加合併
-                            //lean成型數據直接放進assemble表裡
-                            string checkExistingdate_C3 = "SELECT COUNT(*) FROM cut WHERE c_date=@c_date";
-                            string checkExistingdata_C3 = "SELECT lean01 FROM cut";
                             string checkExistingdate_S3 = "SELECT COUNT(*) FROM stitch WHERE c_date=@c_date";
                             string checkExistingdata_S3 = "SELECT lean1線 FROM stitch";
                             string checkExistingdate_A3 = "SELECT COUNT(*) FROM assemble WHERE c_date = @c_date";
@@ -538,19 +469,14 @@ namespace PROCAP_CLIENT
                             using (NpgsqlCommand checkCommanddata_A = new NpgsqlCommand(checkExistingdata_A3, conn))
                             using (NpgsqlCommand checkCommanddate_S = new NpgsqlCommand(checkExistingdate_S3, conn))
                             using (NpgsqlCommand checkCommanddata_S = new NpgsqlCommand(checkExistingdata_S3, conn))
-                            using (NpgsqlCommand checkCommanddate_C = new NpgsqlCommand(checkExistingdate_C3, conn))
-                            using (NpgsqlCommand checkCommanddata_C = new NpgsqlCommand(checkExistingdata_C3, conn))
                             {
                                 checkCommanddate_A.Parameters.AddWithValue("c_date", currentTime);
                                 checkCommanddate_S.Parameters.AddWithValue("c_date", currentTime);
-                                checkCommanddate_C.Parameters.AddWithValue("c_date", currentTime);
                                 // 检查是否存在相同时间戳的记录
                                 int count_A = Convert.ToInt32(checkCommanddate_A.ExecuteScalar());
                                 int count_S = Convert.ToInt32(checkCommanddate_S.ExecuteScalar());
-                                int count_C = Convert.ToInt32(checkCommanddate_C.ExecuteScalar());
                                 object result_A = checkCommanddata_A.ExecuteScalar();
                                 object result_S = checkCommanddata_S.ExecuteScalar();
-                                object result_C = checkCommanddata_C.ExecuteScalar();
                                 if (count_A > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -577,28 +503,6 @@ namespace PROCAP_CLIENT
                                 }
                                 //-------------------------------------------------------------------
                                 // 检查是否存在相同时间戳的记录
-                                if (count_C > 0)
-                                {
-                                    string updateSql_C = "UPDATE cut SET lean03 = @lean03 WHERE c_date = @c_date";
-                                    using (NpgsqlCommand updateCommand_C = new NpgsqlCommand(updateSql_C, conn))
-                                    {
-                                        updateCommand_C.Parameters.AddWithValue("lean03", int.Parse(textBoxchat.Text.Trim()));
-                                        updateCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        updateCommand_C.ExecuteNonQuery();
-                                    }
-                                }
-                                else
-                                {
-                                    // 如果不存在相同时间戳的记录，执行插入操作
-                                    string insertSql_C = "INSERT INTO cut (c_date,lean03) VALUES (@c_date, @lean03)";
-                                    using (NpgsqlCommand insertCommand_C = new NpgsqlCommand(insertSql_C, conn))
-                                    {
-                                        insertCommand_C.Parameters.AddWithValue("c_date", currentTime);
-                                        insertCommand_C.Parameters.AddWithValue("lean03", int.Parse(textBoxchat.Text.Trim()));
-                                        insertCommand_C.ExecuteNonQuery();
-                                    }
-
-                                }
                                 if (count_S > 0)
                                 {
                                     // 如果存在相同时间戳的记录，执行更新操作
@@ -631,7 +535,7 @@ namespace PROCAP_CLIENT
                                 {
                                     a.Text = "";
                                 }
-                                textBoxchat.Focus();
+                                textBoxstitch1.Focus();
                             }
                         }
                     }
@@ -643,7 +547,7 @@ namespace PROCAP_CLIENT
                     {
                         a.Text = "";
                     }
-                    textBoxchat.Focus();
+                    textBoxstitch1.Focus();
                 }
             }
 
@@ -653,41 +557,6 @@ namespace PROCAP_CLIENT
         {
             label1.Text = DateTime.Now.ToString("yyyy-MM-dd" + "產量");
         }
-
-        private void textBoxchat_KeyDown(object sender, KeyEventArgs e)
-        {
-            initializedata();
-            switch (e.KeyCode)
-            {
-                case Keys.Enter:
-                    {
-                        if (!flag)
-                        {
-                            SendKeys.Send("{tab}");
-                        }
-                        else
-                        {
-                            if ((string.IsNullOrEmpty(textBoxchat.Text)))
-                                SendKeys.Send("{tab}");
-                            else
-                            {
-                                for (int i = 3; i < boolarray.Length; i++)
-                                {
-                                    if (boolarray[i])
-                                    {
-                                        textcheck[i - 3].Focus();
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case Keys.Up: radioButtonlean3.Focus(); break;
-                case Keys.Down: textBoxstitch1.Focus(); break;
-            }
-        }
-
         private void textBoxstitch1_KeyDown(object sender, KeyEventArgs e)
         {
             initializedata();
@@ -717,9 +586,8 @@ namespace PROCAP_CLIENT
                         }
                     }
                     break;
-                case Keys.Up: textBoxchat.Focus(); break;
+                case Keys.Up: radioButtonlean3.Focus(); break;
                 case Keys.Down: textBoxstitch2.Focus(); break;
-                case Keys.Back: { if (string.IsNullOrEmpty(textBoxstitch1.Text)) { textBoxchat.Focus(); } } break;
             }
         }
 
@@ -880,7 +748,7 @@ namespace PROCAP_CLIENT
             {
                 a.Text = "";
             }
-            textBoxchat.Focus();
+            textBoxstitch1.Focus();
         }
 
         private void buttonmessage_Click(object sender, EventArgs e)

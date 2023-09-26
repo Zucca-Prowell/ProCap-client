@@ -112,7 +112,7 @@ namespace PROCAP_CLIENT
                 }
             }
         }
-        private void DataGridViewStitch()
+        private void stitchsum()
         {
             int temp;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
@@ -122,59 +122,76 @@ namespace PROCAP_CLIENT
                 {
                     conn.Open();
                     DateTime currentTime = DateTime.Now.Date;
-                    string sqlstitch = "select c_date,stitchsum,stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,lean2線,lean3線,comment from stitch";
                     string sqlstitchsum1 = "select stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,stitchsum from stitch where c_date=@currentTime";
                     string sqlstitchsum2 = "update stitch set stitchsum=@stitchsum where c_date=@currentTime";
-                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlstitch, conn))
+                    using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlstitchsum2, conn))
                     {
-                        using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlstitchsum2, conn))
+                        using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlstitchsum1, conn))
                         {
-                            using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlstitchsum1, conn))
+                            cmd1.Parameters.AddWithValue("@currentTime", currentTime);
+                            using (NpgsqlDataReader reader = cmd1.ExecuteReader())
                             {
-                                cmd1.Parameters.AddWithValue("@currentTime", currentTime);
-                                using (NpgsqlDataReader reader = cmd1.ExecuteReader())
+                                reader.Read();
                                 {
-                                    reader.Read();
-                                    {
-                                        int value1;
-                                        int value2;
-                                        int value3;
-                                        int value4;
-                                        int value5;
-                                        int value6;
-                                        if (reader["stitch1"] is int intValue1)
-                                            value1 = intValue1;
-                                        else
-                                            value1 = 0;
-                                        if (reader["stitch2"] is int intValue2)
-                                            value2 = intValue2;
-                                        else
-                                            value2 = 0;
-                                        if (reader["stitch3"] is int intValue3)
-                                            value3 = intValue3;
-                                        else
-                                            value3 = 0;
-                                        if (reader["stitch4"] is int intValue4)
-                                            value4 = intValue4;
-                                        else
-                                            value4 = 0;
-                                        if (reader["stitch5"] is int intValue5)
-                                            value5 = intValue5;
-                                        else
-                                            value5 = 0;
-                                        if (reader["stitchsum"] is int intValue6)
-                                            value6 = intValue6;
-                                        else
-                                            value6 = 0;
-                                        value6=value1+value2+value3+value4+value5;
-                                        temp = value6;
-                                    }
+                                    int value1;
+                                    int value2;
+                                    int value3;
+                                    int value4;
+                                    int value5;
+                                    int value6;
+                                    if (reader["stitch1"] is int intValue1)
+                                        value1 = intValue1;
+                                    else
+                                        value1 = 0;
+                                    if (reader["stitch2"] is int intValue2)
+                                        value2 = intValue2;
+                                    else
+                                        value2 = 0;
+                                    if (reader["stitch3"] is int intValue3)
+                                        value3 = intValue3;
+                                    else
+                                        value3 = 0;
+                                    if (reader["stitch4"] is int intValue4)
+                                        value4 = intValue4;
+                                    else
+                                        value4 = 0;
+                                    if (reader["stitch5"] is int intValue5)
+                                        value5 = intValue5;
+                                    else
+                                        value5 = 0;
+                                    if (reader["stitchsum"] is int intValue6)
+                                        value6 = intValue6;
+                                    else
+                                        value6 = 0;
+                                    value6 = value1 + value2 + value3 + value4 + value5;
+                                    temp = value6;
                                 }
                             }
-                            cmd2.Parameters.AddWithValue("@currentTime", currentTime);
-                            cmd2.Parameters.AddWithValue("stitchsum", temp);
-                            cmd2.ExecuteNonQuery();
                         }
+                        cmd2.Parameters.AddWithValue("@currentTime", currentTime);
+                        cmd2.Parameters.AddWithValue("stitchsum", temp);
+                        cmd2.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
+            private void DataGridViewStitch()
+            {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    string sqlstitch = "select c_date,stitchsum,stitch1,stitch2,stitch3,stitch4,stitch5,lean1線,lean2線,lean3線,comment from stitch";
+                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlstitch, conn))
+                    {
+                        
                         NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd3);
                         DataTable dataTable_St = new DataTable();
                         adp.Fill(dataTable_St);
@@ -258,6 +275,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -274,6 +292,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -293,6 +312,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            stitchsum();
                                             DataGridViewStitch();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -334,6 +354,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -350,6 +371,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -369,6 +391,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            stitchsum();
                                             DataGridViewStitch();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -410,6 +433,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -426,6 +450,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -445,6 +470,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            stitchsum();
                                             DataGridViewStitch();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -486,6 +512,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -502,6 +529,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -521,6 +549,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            stitchsum();
                                             DataGridViewStitch();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -562,6 +591,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -577,6 +607,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    stitchsum();
                                                     DataGridViewStitch();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -594,6 +625,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            stitchsum();
                                             DataGridViewStitch();
                                             conn.Close();
                                             textBox1.Text = "";

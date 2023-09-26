@@ -150,6 +150,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -166,6 +167,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -185,6 +187,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -226,6 +229,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -242,6 +246,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -261,6 +266,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -302,6 +308,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -318,6 +325,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -337,6 +345,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -378,6 +387,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -394,6 +404,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -413,6 +424,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -454,6 +466,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -470,6 +483,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     comboBox1.SelectedIndex++;
@@ -489,6 +503,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             comboBox1.SelectedIndex++;
@@ -530,6 +545,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("今日數據已更新");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -545,6 +561,7 @@ namespace PROCAP_CLIENT
                                                         updateCommand.ExecuteNonQuery();
                                                     }
                                                     MessageBox.Show("數據提交成功");
+                                                    solesum();
                                                     DataGridViewSole();
                                                     conn.Close();
                                                     textBox1.Text = "";
@@ -563,6 +580,7 @@ namespace PROCAP_CLIENT
                                                 insertCommand.ExecuteNonQuery();
                                             }
                                             MessageBox.Show("數據提交成功");
+                                            solesum();
                                             DataGridViewSole();
                                             conn.Close();
                                             textBox1.Text = "";
@@ -591,7 +609,7 @@ namespace PROCAP_CLIENT
             Y = this.Height;
             setTag(this);
         }
-        private void DataGridViewSole()
+        private void solesum()
         {
             int temp;
             string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
@@ -601,64 +619,82 @@ namespace PROCAP_CLIENT
                 {
                     conn.Open();
                     DateTime currentTime = DateTime.Now.Date;
-                    string sqlsole = "select c_date,solesum,sole1,sole2,sole3,sole4,sole5,sole6,comment from sole";
                     string sqlsolesum1 = "select sole1,sole2,sole3,sole4,sole5,sole6,solesum from sole where c_date=@currentTime";
                     string sqlsolesum2 = "update sole set solesum=@solesum where c_date=@currentTime";
-                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlsole, conn))
+                    using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlsolesum2, conn))
                     {
-                        using (NpgsqlCommand cmd2 = new NpgsqlCommand(sqlsolesum2, conn))
+                        using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlsolesum1, conn))
                         {
-                            using (NpgsqlCommand cmd1 = new NpgsqlCommand(sqlsolesum1, conn))
+                            cmd1.Parameters.AddWithValue("@currentTime", currentTime);
+                            using (NpgsqlDataReader reader = cmd1.ExecuteReader())
                             {
-                                cmd1.Parameters.AddWithValue("@currentTime", currentTime);
-                                using (NpgsqlDataReader reader = cmd1.ExecuteReader())
+                                reader.Read();
                                 {
-                                    reader.Read();
-                                    {
-                                        int value1;
-                                        int value2;
-                                        int value3;
-                                        int value4;
-                                        int value5;
-                                        int value6;
-                                        int value7;
-                                        if (reader["sole1"] is int intValue1)
-                                            value1 = intValue1;
-                                        else
-                                            value1 = 0;
-                                        if (reader["sole2"] is int intValue2)
-                                            value2 = intValue2;
-                                        else
-                                            value2 = 0;
-                                        if (reader["sole3"] is int intValue3)
-                                            value3 = intValue3;
-                                        else
-                                            value3 = 0;
-                                        if (reader["sole4"] is int intValue4)
-                                            value4 = intValue4;
-                                        else
-                                            value4 = 0;
-                                        if (reader["sole5"] is int intValue5)
-                                            value5 = intValue5;
-                                        else
-                                            value5 = 0;
-                                        if (reader["sole6"] is int intValue6)
-                                            value6 = intValue6;
-                                        else
-                                            value6 = 0;
-                                        if (reader["solesum"] is int intValue7)
-                                            value7 = intValue7;
-                                        else
-                                            value7 = 0;
-                                        value7 = value1 + value2 + value3 + value4 + value5 + value6;
-                                        temp = value7;
-                                    }
+                                    int value1;
+                                    int value2;
+                                    int value3;
+                                    int value4;
+                                    int value5;
+                                    int value6;
+                                    int value7;
+                                    if (reader["sole1"] is int intValue1)
+                                        value1 = intValue1;
+                                    else
+                                        value1 = 0;
+                                    if (reader["sole2"] is int intValue2)
+                                        value2 = intValue2;
+                                    else
+                                        value2 = 0;
+                                    if (reader["sole3"] is int intValue3)
+                                        value3 = intValue3;
+                                    else
+                                        value3 = 0;
+                                    if (reader["sole4"] is int intValue4)
+                                        value4 = intValue4;
+                                    else
+                                        value4 = 0;
+                                    if (reader["sole5"] is int intValue5)
+                                        value5 = intValue5;
+                                    else
+                                        value5 = 0;
+                                    if (reader["sole6"] is int intValue6)
+                                        value6 = intValue6;
+                                    else
+                                        value6 = 0;
+                                    if (reader["solesum"] is int intValue7)
+                                        value7 = intValue7;
+                                    else
+                                        value7 = 0;
+                                    value7 = value1 + value2 + value3 + value4 + value5 + value6;
+                                    temp = value7;
                                 }
                             }
-                            cmd2.Parameters.AddWithValue("@solesum", temp);
-                            cmd2.Parameters.AddWithValue("@currentTime", currentTime);
-                            cmd2.ExecuteNonQuery();
                         }
+                        cmd2.Parameters.AddWithValue("@solesum", temp);
+                        cmd2.Parameters.AddWithValue("@currentTime", currentTime);
+                        cmd2.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("數據庫連接失敗: " + ex.Message);
+            }
+        }
+        private void DataGridViewSole()
+        {
+            string connString = "Server=192.168.7.198;Port=5432;Database=postgres;Username=joe;Password=Joe@6666";
+            try
+            {
+                using (NpgsqlConnection conn = new NpgsqlConnection(connString))
+                {
+                    conn.Open();
+                    DateTime currentTime = DateTime.Now.Date;
+                    string sqlsole = "select c_date,solesum,sole1,sole2,sole3,sole4,sole5,sole6,comment from sole";
+                    
+                    using (NpgsqlCommand cmd3 = new NpgsqlCommand(sqlsole, conn))
+                    {
+                       
                           NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd3);
                         DataTable dataTable_So = new DataTable();
                         adp.Fill(dataTable_So);
@@ -742,6 +778,7 @@ namespace PROCAP_CLIENT
                                             updateCommand.ExecuteNonQuery();
                                         }
                                         MessageBox.Show("今日補充說明已更新");
+                                       
                                         DataGridViewSole();
                                         conn.Close();
                                         textBoxcomment.Text = "";
